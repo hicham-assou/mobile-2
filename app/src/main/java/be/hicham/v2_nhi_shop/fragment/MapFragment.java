@@ -49,11 +49,12 @@ public class MapFragment extends Fragment {
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map,container,false);
         SupportMapFragment supportMapFragment =(SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.fragment_Map);
+
         supportMapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
@@ -63,8 +64,8 @@ public class MapFragment extends Fragment {
                 locationListener = new LocationListener() {
                     @Override
                     public void onLocationChanged(Location location) {
-                        // store user latlong
 
+                        // sauvegarder la position das la DB
                         Localisation locationUser =  new Localisation(
                                 location.getLatitude(),
                                 location.getLongitude()
@@ -81,6 +82,7 @@ public class MapFragment extends Fragment {
                                 .addOnFailureListener(exception -> {
                                 });
 
+                        // afficher la position sur la map
                         userLatLong = new LatLng(location.getLatitude(), location.getLongitude());
                         mMap.clear(); // To clear old marker on map
                         mMap.addMarker(new MarkerOptions().position(userLatLong).title("Votre localisation"));
