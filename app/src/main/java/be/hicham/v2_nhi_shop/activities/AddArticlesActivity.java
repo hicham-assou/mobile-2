@@ -71,6 +71,8 @@ public class AddArticlesActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
             pickImage.launch(intent);
         });
+
+        //// mettre la navigation bar qu'on vois en bas de l'écran /////
         binding.bottomNavigationView.setSelectedItemId(R.id.navigation_addarticles);
         binding.bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -96,6 +98,8 @@ public class AddArticlesActivity extends AppCompatActivity {
                 return true;
             }
         });
+        ///// nav bar fin /////
+
         binding.buttonAddArticle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,8 +107,6 @@ public class AddArticlesActivity extends AppCompatActivity {
                     addArticle();
                 }
             }
-
-
         });
     }
 
@@ -128,6 +130,7 @@ public class AddArticlesActivity extends AppCompatActivity {
             }
     );
 
+    ///// requirements pour pouvoir ajouter un article (titre, prix, ...)
     private boolean isValidInput() {
 
         if (binding.titleArticle.getText().toString().trim().isEmpty()) {
@@ -147,6 +150,7 @@ public class AddArticlesActivity extends AppCompatActivity {
         }
     }
 
+    //// si il est pas co alors on le renvoie a l'activity login
     private void checkSession() {
 
         if (preferenceManager.getString(Constants.KEY_USER_ID) == null) {
@@ -155,6 +159,7 @@ public class AddArticlesActivity extends AppCompatActivity {
 
     }
 
+    /// ajouter des article a la DB du coup a l'application
     private void addArticle() {
         loading(true);
         FirebaseFirestore database = FirebaseFirestore.getInstance();
@@ -199,6 +204,8 @@ public class AddArticlesActivity extends AppCompatActivity {
             progressDialog.dismiss();
         }
     }
+
+    ///// méthodes nécesaires a addArticle()
 
     private String encodeImage(Bitmap bitmap) {
         int previewWidth = 150;

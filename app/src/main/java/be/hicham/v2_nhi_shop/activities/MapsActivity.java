@@ -89,18 +89,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         })
                         .addOnFailureListener(exception -> {
                         });
-                /*FirebaseDatabase.getInstance().getReference("localisation Actuel")
-                        .setValue(locationUser).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()){
-                                    Toast.makeText(MapsActivity.this, "Localisation saved", Toast.LENGTH_SHORT).show();
-                                }
-                                else {
-                                    Toast.makeText(MapsActivity.this, "Localisation not saved", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });*/
+
 
                 userLatLong = new LatLng(location.getLatitude(), location.getLongitude());
                 mMap.clear(); // To clear old marker on map

@@ -44,10 +44,8 @@ public class MapFragment extends Fragment {
     LatLng userLatLong;
     LocationListener locationListener;
     LocationManager locationManager;
-    private PreferenceManager preferenceManager;
 
     private GoogleMap mMap;
-    private ActivityMapsBinding binding;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 

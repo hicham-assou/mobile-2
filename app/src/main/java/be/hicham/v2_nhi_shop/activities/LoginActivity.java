@@ -41,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void setListeners() {
+        /// renvoie a l'activity register
         binding.textCreateNewAccount.setOnClickListener(v ->
                 startActivity(new Intent(getApplicationContext(), RegisterActivity.class)));
 
@@ -51,11 +52,13 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    /// si il appuis sur retour il revient a la page home(mainActivity)
     @Override
     public void onBackPressed() {
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
 
+    /// requirements pour pouvoir se connecter sinn il peut pas
     private boolean isValidSignInput() {
         if (binding.inputEmail.getText().toString().trim().isEmpty()) {
             binding.inputEmail.setError("Email is required!");
@@ -72,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    /// vérification avec la DB
     private void signIn() {
         loading(true);
         FirebaseFirestore database = FirebaseFirestore.getInstance();

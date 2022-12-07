@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
         //Setting the ArrayAdapter data on the Spinner
         binding.spinner.setAdapter(aa);
 
+        //// nav bar
         binding.bottomNavigationView.setSelectedItemId(R.id.navigation_home);
         binding.bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -153,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
+    /// test to show article that we clcked on
     @Override
     public void onArticleViewClicked(Article article) {
         Intent intent = new Intent(getApplicationContext(), DetailArticleActivity.class);

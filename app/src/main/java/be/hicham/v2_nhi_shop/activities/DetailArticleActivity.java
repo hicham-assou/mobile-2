@@ -37,12 +37,13 @@ public class DetailArticleActivity extends AppCompatActivity {
         article = (Article) getIntent().getSerializableExtra(Constants.KEY_TITLE_ARTICLE);
         setListeners();
 
-            //////// MAPS FRAGMENT CREATION///////////////
-            Fragment fragment = new MapFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.mapView,fragment).commit();
+        //////// MAPS FRAGMENT CREATION///////////////
+        Fragment fragment = new MapFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.mapView,fragment).commit();
 
     }
 
+    /// inisialiasation
     private void setListeners() {
         binding.imageViewArticle.setImageBitmap(getBitmapFromEncodedString(article.getImage())); // image
         binding.textViewDetailTitle.setText(article.getTitle());

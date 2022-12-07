@@ -88,6 +88,8 @@ public class ProfileActivity extends AppCompatActivity {
             pickImage.launch(intent);
 
         });
+
+        //// nav bar
         binding.bottomNavigationView.setSelectedItemId(R.id.navigation_account);
         binding.bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -115,6 +117,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    /// mettre a jour l'image de profile
     private void updateImageProfile() {
         HashMap<String, Object> userDetail = new HashMap<>();
         userDetail.put(Constants.KEY_IMAGE, encodedImage);
