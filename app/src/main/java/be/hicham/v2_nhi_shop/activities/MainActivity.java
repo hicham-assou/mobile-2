@@ -55,12 +55,8 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
         setContentView(binding.getRoot());
         setListeners();
         getArticles();
-        sayYes();
     }
 
-    private void sayYes() {
-        System.out.println("yessss");
-    }
 
     private void getArticles() {
         loading(true);
