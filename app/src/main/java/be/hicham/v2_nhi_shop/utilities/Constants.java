@@ -34,16 +34,26 @@ public class Constants {
     public static final String KEY_LAST_MESSAGE = "lastMessage";
     public static final String REMOTE_MSG_AUTHORIZATION = "Authorization";
     public static final String REMOTE_MSG_CONTENT_TYPE = "Content-Type";
+    public static final String REMOTE_MSG_DATA = "data";
+    public static final String REMOTE_MSG_REGISTRATION_IDS = "registration_ids";
 
-   /* public static HashMap<String, String> remoteMsgHeaders = null;
+
+    public static HashMap<String, String> remoteMsgHeaders = null;
     public static HashMap<String, String> getRemoteMsgHeaders() {
         if (remoteMsgHeaders == null){
             remoteMsgHeaders = new HashMap<>();
-            remoteMsgHeaders.put(REMOTE_MSG_AUTHORIZATION,
-                    )
+            remoteMsgHeaders.put(
+                    REMOTE_MSG_AUTHORIZATION,
+                    "key=AAAAxlZf-0c:APA91bFjcl2W_qK0vJ-0qT1Qx5Y5oqOLz_1sQDhFhxQyCmuV1aU8sfht7VYB5AGL9lugRjzRasucWABa354cy5nLn1iPdxF-s44j_vN3qdBsgFSp6fqxMt8bR_n1UawBtyNh9ATw9i2Z"
+            );
+            remoteMsgHeaders.put(
+                    REMOTE_MSG_CONTENT_TYPE,
+                    "application/json"
+            );
         }
+        return remoteMsgHeaders;
     }
-*/
+
 
 
 }

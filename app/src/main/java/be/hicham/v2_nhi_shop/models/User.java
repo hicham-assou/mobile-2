@@ -39,4 +39,5 @@ public class User implements Serializable {
     public String getImage() { return image; }
     public String getId() { return id; }
     public String getPassword() { return password; }
+    public String getToken() { return token; }
 }
