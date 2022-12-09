@@ -57,7 +57,6 @@ public class MessageryActivity extends AppCompatActivity implements ArticleChatL
     }
 
     private void setListeners() {
-        binding.imageBack.setOnClickListener(v -> getChats());
         binding.bottomNavigationView.setSelectedItemId(R.id.navigation_message);
         binding.bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -89,9 +88,8 @@ public class MessageryActivity extends AppCompatActivity implements ArticleChatL
         if (preferenceManager.getString(Constants.KEY_USER_ID) == null){
             startActivity(new Intent(MessageryActivity.this, LoginActivity.class));
         } else {
-            getChats();
-            //listenConversations();
-            //init();
+            init();
+            listenConversations();
         }
     }
 
@@ -139,6 +137,7 @@ public class MessageryActivity extends AppCompatActivity implements ArticleChatL
 
     }
 
+    // Permet de retrouver les conversations entre utilisateurs
     private void listenConversations(){
         database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
                 .whereEqualTo(Constants.KEY_SENDER_ID, preferenceManager.getString(Constants.KEY_USER_ID))
@@ -218,5 +217,11 @@ public class MessageryActivity extends AppCompatActivity implements ArticleChatL
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         intent.putExtra(Constants.KEY_USER, user);
         startActivity(intent);
+    }
+
+    /// si il appuis sur retour il revient a la page home(mainActivity)
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
 }

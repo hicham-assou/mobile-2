@@ -42,7 +42,7 @@ import be.hicham.v2_nhi_shop.utilities.PreferenceManager;
 
 public class MainActivity extends AppCompatActivity implements ArticleViewListener,
         AdapterView.OnItemSelectedListener {
-        String[] sorting = { "Sort By", "Price", "Localisation", "Date"};
+        String[] sorting = { "Sort By Date", "Sort By Price", "Sort By Localisation"};
 
     private ActivityMainBinding binding;
     private PreferenceManager preferenceManager;
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
 
     private void setListeners() {
         binding.searchBar.setOnClickListener(v -> binding.imageDelete.setVisibility(View.VISIBLE) );
-        binding.imageDelete.setOnClickListener(v -> { binding.searchBar.getText().clear();});
+        binding.imageDelete.setOnClickListener(v -> { binding.searchBar.getText().clear(); binding.imageDelete.setVisibility(View.INVISIBLE);});
         binding.spinner.setOnItemSelectedListener(this);
 
         //Creating the ArrayAdapter instance having the country list
@@ -174,5 +174,11 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
         public void onNothingSelected(AdapterView<?> arg0) {
             // TODO Auto-generated method stub
         }
+
+    /// si il appuis sur retour il revient a la page home(mainActivity)
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+    }
 
     }

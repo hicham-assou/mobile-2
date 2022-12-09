@@ -150,7 +150,6 @@ public class ChatActivity extends AppCompatActivity {
                     } catch (JSONException e){
                         e.printStackTrace();
                     }
-                    showToast("Notification sent successfully");
                 } else {
                     showToast("Error " + response.code());
                 }
@@ -226,11 +225,6 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onBackPressed() {
-        startActivity(new Intent(getApplicationContext(), MessageryActivity.class));
-    }
-
     private String getReadableDateTime(Date date) {
         return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }
@@ -280,5 +274,10 @@ public class ChatActivity extends AppCompatActivity {
 
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplicationContext(), MessageryActivity.class));
     }
 }

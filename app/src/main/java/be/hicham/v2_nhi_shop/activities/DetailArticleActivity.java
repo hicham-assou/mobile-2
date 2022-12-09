@@ -1,6 +1,5 @@
 package be.hicham.v2_nhi_shop.activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -9,9 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -20,39 +16,73 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import be.hicham.v2_nhi_shop.R;
-import be.hicham.v2_nhi_shop.databinding.ActivityAddArticlesBinding;
 import be.hicham.v2_nhi_shop.databinding.ActivityDetailArticleBinding;
 import be.hicham.v2_nhi_shop.fragment.MapFragment;
 import be.hicham.v2_nhi_shop.models.Article;
+import be.hicham.v2_nhi_shop.models.User;
 import be.hicham.v2_nhi_shop.utilities.Constants;
+import be.hicham.v2_nhi_shop.utilities.PreferenceManager;
 
 public class DetailArticleActivity extends AppCompatActivity {
 
-    String wheaterValue = "";
+    private String wheaterValue = "";
     private ActivityDetailArticleBinding binding;
-    Article article;
+    private Article article;
+    private User user;
+    private PreferenceManager preferenceManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityDetailArticleBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        preferenceManager = new PreferenceManager(getApplicationContext());
 
         // retrieve article from mainActivity
         article = (Article) getIntent().getSerializableExtra(Constants.KEY_TITLE_ARTICLE);
         setListeners();
+        setSeller();
 
         //////// MAPS FRAGMENT CREATION///////////////
         Fragment fragment = new MapFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.mapView,fragment).commit();
 
+    }
+
+    private void setSeller() {
+        user = new User();
+
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        database.collection(Constants.KEY_COLLECTION_USERS)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null){
+                        for (QueryDocumentSnapshot queryDocumentSnapshot: task.getResult()) {
+                            if (article.getSellerUsername().equals(queryDocumentSnapshot.getString(Constants.KEY_USERNAME))){
+                                user.setUsername(queryDocumentSnapshot.getString(Constants.KEY_USERNAME));
+                                user.setEmail(queryDocumentSnapshot.getString(Constants.KEY_EMAIL));
+                                user.setImage(queryDocumentSnapshot.getString(Constants.KEY_IMAGE));
+                                user.setToken(queryDocumentSnapshot.getString(Constants.KEY_FCM_TOKEN));
+                                user.setId(queryDocumentSnapshot.getId());
+                            }
+
+                        }
+                    } else {
+                        showToast("Can't retrieve seller");
+                    }
+                });
+
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     /// inisialiasation
@@ -62,10 +92,30 @@ public class DetailArticleActivity extends AppCompatActivity {
         binding.textViewDetailPrice.setText(article.getPrice() + " €");
         binding.textViewDetailDate.setText(article.getDatePosted());
         binding.textViewDetailCall.setText("0465754813");
+        binding.textViewDetailMessage.setOnClickListener(v-> {
+            if (checkSession()){
+                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                intent.putExtra(Constants.KEY_USER, user);
+                startActivity(intent);
+                finish();
+            }
+        });
         System.out.println("before => " );
         getWeather();
         //binding.textViewDetailDescription.setText(article.getDescription() + "\n" + wheaterValue);
 
+    }
+
+    private boolean checkSession() {
+        if (preferenceManager.getString(Constants.KEY_USER_ID) == null){
+            startActivity(new Intent(DetailArticleActivity.this, LoginActivity.class));
+
+            return false;
+
+        } else {
+            return true;
+
+        }
     }
 
     private void getWeather() {

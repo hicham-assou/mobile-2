@@ -133,4 +133,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }).check();
     }
+
+    /// si il appuis sur retour il revient a la page home(mainActivity)
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+    }
 }
