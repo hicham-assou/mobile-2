@@ -66,6 +66,7 @@ public class ChatActivity extends AppCompatActivity {
         database = FirebaseFirestore.getInstance();
     }
 
+    //envoyer un message
     private void sendMessage() {
         HashMap<String, Object> message = new HashMap<>();
         message.put(Constants.KEY_SENDER_ID, preferenceManager.getString(Constants.KEY_USER_ID));
