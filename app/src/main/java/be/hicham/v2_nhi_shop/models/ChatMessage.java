@@ -5,9 +5,19 @@ import android.graphics.Bitmap;
 import java.util.Date;
 
 public class ChatMessage {
-    public String senderId, receiverId, message, dateTime;
+    public String senderId;
+    public String receiverId;
+    public String message;
+    public String dateTime;
+    public String articleTitle;
+
+
+
+    public String articleId;
+    public String conversionId;
+    public String conversionName;
+    public String conversionImage;
     public Date dateObject;
-    public String conversionId, conversionName, conversionImage;
 
     public void setSenderId(String senderId) {
         this.senderId = senderId;
@@ -40,13 +50,26 @@ public class ChatMessage {
     public String getConversionMessage() {
         return message;
     }
+
     public String getConversionId() {
         return conversionId;
     }
 
+    public void setArticleTitle(String articleTitle) { this.articleTitle = articleTitle; }
+
+    public String getArticleTitle() { return articleTitle; }
+
+    public String getArticleId() {
+        return articleId;
+    }
+
+    public void setArticleId(String articleId) {
+        this.articleId = articleId;
+    }
+
     public void setImage(String conversionImage) { this.conversionImage = conversionImage;}
 
-    public void setConversionName(String conversionName) {this.conversionName = conversionName;}
+    public void setConversionName(String conversionName) { this.conversionName = conversionName;}
 
     public void setConversionId(String conversionId) {this.conversionId = conversionId;}
 }

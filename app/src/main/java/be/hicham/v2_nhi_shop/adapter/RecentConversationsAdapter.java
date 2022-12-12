@@ -64,7 +64,7 @@ public class RecentConversationsAdapter extends RecyclerView.Adapter<RecentConve
                 user.setId(chatMessage.getConversionId());
                 user.setUsername(chatMessage.conversionName);
                 user.setImage(chatMessage.getImage());
-                conversionListener.onConversionClicked(user);
+                conversionListener.onConversionClicked(user, chatMessage.getArticleId());
             });
         }
     }

@@ -4,7 +4,16 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class Article  implements Serializable {
-    private String title, description, image, sellerUsername, localisation, id, dateTime;
+    private String title;
+    private String description;
+    private String image;
+    private String sellerUsername;
+    private String localisation;
+
+
+
+    private String id;
+    private String dateTime;
     public Date dateObject;
     private double price;
 
@@ -65,6 +74,9 @@ public class Article  implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+    public String getId() {
+        return id;
     }
 
     public void setSeller(String sellerUsername) {

@@ -19,6 +19,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         preferenceManager = new PreferenceManager(getApplicationContext());
         setContentView(binding.getRoot());
+
         setListeners();
         getArticles();
     }
@@ -154,8 +157,7 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
     @Override
     public void onArticleViewClicked(Article article) {
         Intent intent = new Intent(getApplicationContext(), DetailArticleActivity.class);
-        showToast("Click on " + article.getTitle());
-        intent.putExtra(Constants.KEY_TITLE_ARTICLE, article);
+        intent.putExtra(Constants.KEY_ARTICLE, article);
         startActivity(intent);
         finish();
     }
@@ -165,7 +167,8 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
         return new SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault()).format(date);
     }
 
-        //Performing action onItemSelected and onNothing selected
+
+    //Performing action onItemSelected and onNothing selected
         @Override
         public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
             //Toast.makeText(getApplicationContext(),sorting[position] , Toast.LENGTH_LONG).show();

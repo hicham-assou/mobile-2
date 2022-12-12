@@ -3,7 +3,7 @@ package be.hicham.v2_nhi_shop.models;
 import java.io.Serializable;
 
 public class User implements Serializable {
-    private String email, username, password, token, image, id;
+    private String email, username, password, token, image, id, phoneNumber;
 
     public User() {}
 
@@ -40,4 +40,8 @@ public class User implements Serializable {
     public String getId() { return id; }
     public String getPassword() { return password; }
     public String getToken() { return token; }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 }

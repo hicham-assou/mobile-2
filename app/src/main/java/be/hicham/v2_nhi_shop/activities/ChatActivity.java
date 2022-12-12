@@ -40,6 +40,7 @@ import java.util.Locale;
 import be.hicham.v2_nhi_shop.adapter.ChatAdapter;
 import be.hicham.v2_nhi_shop.adapter.UserAdapter;
 import be.hicham.v2_nhi_shop.databinding.ActivityChatBinding;
+import be.hicham.v2_nhi_shop.models.Article;
 import be.hicham.v2_nhi_shop.models.ChatMessage;
 import be.hicham.v2_nhi_shop.models.User;
 import be.hicham.v2_nhi_shop.network.ApiClient;
@@ -54,6 +55,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private ActivityChatBinding binding;
     private User receiverUser;
+    private Article article;
     private List<ChatMessage> chatMessages;
     private ChatAdapter chatAdapter;
     private PreferenceManager preferenceManager;
@@ -65,13 +67,19 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        setListeners();
+        loadArticleDetails();
         loadReceiverDetails();
+        showToast("User " + receiverUser.getId());
+        showToast("Article " + article.getId());
+
+        setListeners();
         init();
         listenMessages();
     }
 
     private void init() {
+
+        binding.textName.setText(receiverUser.getUsername());
         preferenceManager = new PreferenceManager(getApplicationContext());
         chatMessages = new ArrayList<>();
         chatAdapter = new ChatAdapter(
@@ -81,6 +89,7 @@ public class ChatActivity extends AppCompatActivity {
         );
         binding.chatRecyclerView.setAdapter(chatAdapter);
         database = FirebaseFirestore.getInstance();
+
     }
 
     //envoyer un message
@@ -89,6 +98,8 @@ public class ChatActivity extends AppCompatActivity {
         message.put(Constants.KEY_SENDER_ID, preferenceManager.getString(Constants.KEY_USER_ID));
         message.put(Constants.KEY_RECEIVER_ID, receiverUser.getId());
         message.put(Constants.KEY_MESSAGE, binding.inputMessage.getText().toString());
+        message.put(Constants.KEY_ARTICLE_ID, article.getId());
+        message.put(Constants.KEY_TITLE_ARTICLE, article.getTitle());
         message.put(Constants.KEY_TIMESTAMP, new Date());
         database.collection(Constants.KEY_COLLECTION_CHAT).add(message);
         if (conversionId != null) {
@@ -102,6 +113,8 @@ public class ChatActivity extends AppCompatActivity {
             conversion.put(Constants.KEY_RECEIVER_NAME, receiverUser.getUsername());
             conversion.put(Constants.KEY_RECEIVER_IMAGE, receiverUser.getImage());
             conversion.put(Constants.KEY_LAST_MESSAGE, binding.inputMessage.getText().toString());
+            conversion.put(Constants.KEY_ARTICLE_ID, article.getId());
+            conversion.put(Constants.KEY_TITLE_ARTICLE, article.getTitle());
             conversion.put(Constants.KEY_TIMESTAMP, new Date());
             addConversion(conversion);
         }
@@ -163,13 +176,16 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void listenMessages() {
+        //recup les messages qui concernent 2 utilisateurs et un article
         database.collection(Constants.KEY_COLLECTION_CHAT)
                 .whereEqualTo(Constants.KEY_SENDER_ID, preferenceManager.getString(Constants.KEY_USER_ID))
                 .whereEqualTo(Constants.KEY_RECEIVER_ID, receiverUser.getId())
+                .whereEqualTo(Constants.KEY_ARTICLE_ID, article.getId())
                 .addSnapshotListener(eventListener);
         database.collection(Constants.KEY_COLLECTION_CHAT)
                 .whereEqualTo(Constants.KEY_SENDER_ID, receiverUser.getId())
                 .whereEqualTo(Constants.KEY_RECEIVER_ID, preferenceManager.getString(Constants.KEY_USER_ID))
+                .whereEqualTo(Constants.KEY_ARTICLE_ID, article.getId())
                 .addSnapshotListener(eventListener);
     }
 
@@ -185,6 +201,8 @@ public class ChatActivity extends AppCompatActivity {
                     chatMessage.setSenderId(documentChange.getDocument().getString(Constants.KEY_SENDER_ID));
                     chatMessage.setReceiverId(documentChange.getDocument().getString(Constants.KEY_RECEIVER_ID));
                     chatMessage.setMessage(documentChange.getDocument().getString(Constants.KEY_MESSAGE));
+                    chatMessage.setArticleId(documentChange.getDocument().getString(Constants.KEY_ARTICLE_ID));
+                    chatMessage.setArticleTitle(documentChange.getDocument().getString(Constants.KEY_TITLE_ARTICLE));
                     chatMessage.setDateTime(getReadableDateTime(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP)));
                     chatMessage.setDateObject(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
                     chatMessages.add(chatMessage);
@@ -216,13 +234,23 @@ public class ChatActivity extends AppCompatActivity {
 
     private void loadReceiverDetails() {
         receiverUser = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
-        binding.textName.setText(receiverUser.getUsername());
+    }
+
+    private void loadArticleDetails() {
+
+        article = (Article) getIntent().getSerializableExtra(Constants.KEY_ARTICLE);
+
     }
 
     private void setListeners() {
         binding.imageBack.setOnClickListener(v -> onBackPressed());
         binding.layoutSend.setOnClickListener(v -> sendMessage());
-
+        binding.imageInfo.setOnClickListener(v -> {
+                Intent intent = new Intent(getApplicationContext(), DetailArticleActivity.class);
+                intent.putExtra(Constants.KEY_ARTICLE, article);
+                startActivity(intent);
+                finish();
+        });
     }
 
     private String getReadableDateTime(Date date) {
@@ -248,19 +276,22 @@ public class ChatActivity extends AppCompatActivity {
         if (chatMessages.size() != 0){
             checkForConversionRemotely(
                     preferenceManager.getString(Constants.KEY_USER_ID),
-                    receiverUser.getId()
+                    receiverUser.getId(),
+                    article.getId()
             );
             checkForConversionRemotely(
                     receiverUser.getId(),
-                    preferenceManager.getString(Constants.KEY_USER_ID)
+                    preferenceManager.getString(Constants.KEY_USER_ID),
+                    article.getId()
             );
         }
     }
 
-    private void checkForConversionRemotely(String senderId, String receiverId){
+    private void checkForConversionRemotely(String senderId, String receiverId, String articleId){
         database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
                 .whereEqualTo(Constants.KEY_SENDER_ID, senderId)
                 .whereEqualTo(Constants.KEY_RECEIVER_ID, receiverId)
+                .whereEqualTo(Constants.KEY_ARTICLE_ID, articleId)
                 .get()
                 .addOnCompleteListener(conversionOnCompleteListener);
     }

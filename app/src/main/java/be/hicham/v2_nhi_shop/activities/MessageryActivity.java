@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
@@ -22,9 +23,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import org.checkerframework.checker.units.qual.A;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import be.hicham.v2_nhi_shop.R;
 import be.hicham.v2_nhi_shop.adapter.RecentConversationsAdapter;
@@ -32,12 +36,13 @@ import be.hicham.v2_nhi_shop.adapter.UserAdapter;
 import be.hicham.v2_nhi_shop.databinding.ActivityMessageryBinding;
 import be.hicham.v2_nhi_shop.listeners.ArticleChatListener;
 import be.hicham.v2_nhi_shop.listeners.ConversionListener;
+import be.hicham.v2_nhi_shop.models.Article;
 import be.hicham.v2_nhi_shop.models.ChatMessage;
 import be.hicham.v2_nhi_shop.models.User;
 import be.hicham.v2_nhi_shop.utilities.Constants;
 import be.hicham.v2_nhi_shop.utilities.PreferenceManager;
 
-public class MessageryActivity extends AppCompatActivity implements ArticleChatListener, ConversionListener {
+public class MessageryActivity extends AppCompatActivity implements  ConversionListener {
 
     private ActivityMessageryBinding binding;
     private PreferenceManager preferenceManager;
@@ -53,7 +58,6 @@ public class MessageryActivity extends AppCompatActivity implements ArticleChatL
         preferenceManager = new PreferenceManager(getApplicationContext());
         checkSession();
         setListeners();
-        //listenConversations();
     }
 
     private void setListeners() {
@@ -100,6 +104,7 @@ public class MessageryActivity extends AppCompatActivity implements ArticleChatL
         database = FirebaseFirestore.getInstance();
     }
 
+/* Methode permettant d'afficher tout les utilisateurs
     private void getChats(){
         loading(true);
         FirebaseFirestore database = FirebaseFirestore.getInstance();
@@ -136,7 +141,7 @@ public class MessageryActivity extends AppCompatActivity implements ArticleChatL
                 });
 
     }
-
+*/
     // Permet de retrouver les conversations entre utilisateurs
     private void listenConversations(){
         database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
@@ -152,6 +157,7 @@ public class MessageryActivity extends AppCompatActivity implements ArticleChatL
             return ;
         }
         if (value != null){
+            loading(true);
             for (DocumentChange documentChange : value.getDocumentChanges()) {
                 if (documentChange.getType() == DocumentChange.Type.ADDED) {
                     String senderId = documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
@@ -161,15 +167,16 @@ public class MessageryActivity extends AppCompatActivity implements ArticleChatL
                     chatMessage.setReceiverId(receiverId);
                     if (preferenceManager.getString(Constants.KEY_USER_ID).equals(senderId)){
                         chatMessage.setImage(documentChange.getDocument().getString(Constants.KEY_RECEIVER_IMAGE));
-                        chatMessage.setConversionName(documentChange.getDocument().getString(Constants.KEY_RECEIVER_NAME));
+                        chatMessage.setConversionName(documentChange.getDocument().getString(Constants.KEY_TITLE_ARTICLE) + " - " + documentChange.getDocument().getString(Constants.KEY_RECEIVER_NAME));
                         chatMessage.setConversionId(documentChange.getDocument().getString(Constants.KEY_RECEIVER_ID));
                     } else {
                         chatMessage.setImage(documentChange.getDocument().getString(Constants.KEY_SENDER_IMAGE));
-                        chatMessage.setConversionName(documentChange.getDocument().getString(Constants.KEY_SENDER_NAME));
+                        chatMessage.setConversionName(documentChange.getDocument().getString(Constants.KEY_TITLE_ARTICLE) + " - " + documentChange.getDocument().getString(Constants.KEY_SENDER_NAME));
                         chatMessage.setConversionId(documentChange.getDocument().getString(Constants.KEY_SENDER_ID));
                     }
                     chatMessage.setMessage(documentChange.getDocument().getString(Constants.KEY_LAST_MESSAGE));
                     chatMessage.setDateObject(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
+                    chatMessage.setArticleId(documentChange.getDocument().getString(Constants.KEY_ARTICLE_ID));
                     conversations.add(chatMessage);
                 } else if (documentChange.getType() == DocumentChange.Type.MODIFIED){
                     for (int i = 0; i < conversations.size(); i++){
@@ -183,16 +190,22 @@ public class MessageryActivity extends AppCompatActivity implements ArticleChatL
                     }
                 }
             }
+            loading(false);
+
             Collections.sort(conversations, (obj1, obj2) -> obj2.dateObject.compareTo(obj1.dateObject));
             conversationsAdapter.notifyDataSetChanged();
             binding.conversationsRecyclerView.smoothScrollToPosition(0);
             binding.conversationsRecyclerView.setVisibility(View.VISIBLE);
             binding.progressBar.setVisibility(View.GONE);
+
+            if (conversations.size() == 0){
+                showErrorMessage();
+            }
         }
     };
 
     private void showErrorMessage(){
-        binding.textErrorMessage.setText(String.format("%s", "No chat"));
+        binding.textErrorMessage.setText(String.format("%s", "No conversions"));
         binding.textErrorMessage.setVisibility(View.VISIBLE);
     }
 
@@ -204,19 +217,52 @@ public class MessageryActivity extends AppCompatActivity implements ArticleChatL
         }
     }
 
-    @Override
-    public void onArticleChatClicked(User user) {
-        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-        intent.putExtra(Constants.KEY_USER, user);
-        startActivity(intent);
-        finish();
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
+
     @Override
-    public void onConversionClicked(User user) {
+    public void onConversionClicked(User user, String articleId) {
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         intent.putExtra(Constants.KEY_USER, user);
+        Article article = setArticle(articleId);
+        intent.putExtra(Constants.KEY_ARTICLE, article);
         startActivity(intent);
+    }
+
+    private Article setArticle(String articleId) {
+
+        Article articleNew = new Article();
+
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        database.collection(Constants.KEY_COLLECTION_ARTICLES)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()) {
+                            if (articleId.equals(queryDocumentSnapshot.getId())) {
+                                articleNew.setTitle(queryDocumentSnapshot.getString(Constants.KEY_TITLE_ARTICLE));
+                                articleNew.setDescription(queryDocumentSnapshot.getString(Constants.KEY_DESCRIPTION_ARTICLE));
+                                articleNew.setSeller(queryDocumentSnapshot.getString(Constants.KEY_USERNAME));
+                                articleNew.setLocalisation(queryDocumentSnapshot.getString(Constants.KEY_LOCALISATION_ARTICLE));
+                                articleNew.setDateTime(getReadableDateTime(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE)));
+                                articleNew.setDateObject(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE));
+                                articleNew.setPrice(Double.parseDouble(queryDocumentSnapshot.getString(Constants.KEY_PRICE_ARTICLE)));
+                                articleNew.setImage(queryDocumentSnapshot.getString(Constants.KEY_IMAGE_ARTICLE));
+                                articleNew.setId(queryDocumentSnapshot.getId());
+                            }
+                        }
+                    } else {
+                        showToast("Can't retrieve article");
+                    }
+                });
+
+        return articleNew;
+    }
+
+    private String getReadableDateTime(Date date) {
+        return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }
 
     /// si il appuis sur retour il revient a la page home(mainActivity)

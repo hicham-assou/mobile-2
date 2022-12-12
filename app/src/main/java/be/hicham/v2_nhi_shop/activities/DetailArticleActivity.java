@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -46,9 +47,11 @@ public class DetailArticleActivity extends AppCompatActivity {
         preferenceManager = new PreferenceManager(getApplicationContext());
 
         // retrieve article from mainActivity
-        article = (Article) getIntent().getSerializableExtra(Constants.KEY_TITLE_ARTICLE);
-        setListeners();
+        article = (Article) getIntent().getSerializableExtra(Constants.KEY_ARTICLE);
         setSeller();
+        init();
+        setListeners();
+
 
         //////// MAPS FRAGMENT CREATION///////////////
         Fragment fragment = new MapFragment();
@@ -72,7 +75,6 @@ public class DetailArticleActivity extends AppCompatActivity {
                                 user.setToken(queryDocumentSnapshot.getString(Constants.KEY_FCM_TOKEN));
                                 user.setId(queryDocumentSnapshot.getId());
                             }
-
                         }
                     } else {
                         showToast("Can't retrieve seller");
@@ -85,36 +87,48 @@ public class DetailArticleActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
-    /// inisialiasation
-    private void setListeners() {
+    /// initialisation
+    private void init() {
         binding.imageViewArticle.setImageBitmap(getBitmapFromEncodedString(article.getImage())); // image
         binding.textViewDetailTitle.setText(article.getTitle());
         binding.textViewDetailPrice.setText(article.getPrice() + " €");
         binding.textViewDetailDate.setText(article.getDatePosted());
-        binding.textViewDetailCall.setText("0465754813");
+        binding.textViewDetailCall.setText(user.getPhoneNumber());
+        System.out.println(preferenceManager.getString(Constants.KEY_USERNAME) + "ATESSTT -------------------------- " + article.getSellerUsername());
+        System.out.println( article.getSellerUsername() == preferenceManager.getString(Constants.KEY_USERNAME));
+
+        if (article.getSellerUsername().equals(preferenceManager.getString(Constants.KEY_USERNAME))){
+            binding.textViewDetailMessage.setVisibility(View.GONE);
+        }
+    }
+    private void setListeners() {
+
         binding.textViewDetailMessage.setOnClickListener(v-> {
             if (checkSession()){
                 Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
                 intent.putExtra(Constants.KEY_USER, user);
+                intent.putExtra(Constants.KEY_ARTICLE, article);
                 startActivity(intent);
                 finish();
             }
         });
-        System.out.println("before => " );
+
         getWeather();
         //binding.textViewDetailDescription.setText(article.getDescription() + "\n" + wheaterValue);
 
     }
 
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+    }
+
     private boolean checkSession() {
         if (preferenceManager.getString(Constants.KEY_USER_ID) == null){
             startActivity(new Intent(DetailArticleActivity.this, LoginActivity.class));
-
             return false;
-
         } else {
             return true;
-
         }
     }
 
