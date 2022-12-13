@@ -9,6 +9,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -18,6 +19,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -57,13 +63,17 @@ import be.hicham.v2_nhi_shop.databinding.ActivityAddArticlesBinding;
 import be.hicham.v2_nhi_shop.utilities.Constants;
 import be.hicham.v2_nhi_shop.utilities.PreferenceManager;
 
-public class AddArticlesActivity extends AppCompatActivity {
+public class AddArticlesActivity extends AppCompatActivity implements LocationListener {
 
     private String encodedImage;
     private ActivityAddArticlesBinding binding;
     private PreferenceManager preferenceManager;
     private ProgressDialog progressDialog;
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 101;
+
+    Button button_localisation;
+    // initialise LocationManager class
+    LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,8 +120,8 @@ public class AddArticlesActivity extends AppCompatActivity {
                 return true;
             }
         });
-        ///// nav bar fin /////
 
+        ///// nav bar fin /////
         binding.buttonAddArticle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,6 +130,35 @@ public class AddArticlesActivity extends AppCompatActivity {
                 }
             }
         });
+
+        //Runtime permissions
+        if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
+            !=PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(this, new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                },100);
+        }
+
+
+        /////// ADRESSE BOUTTON/////////
+        binding.buttonLocalisation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getLocation();
+            }
+        });
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getLocation() {
+        // LocationManager class provides the facility to get latitude and longitude coordinates of current location
+        try {
+            locationManager =(LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,5,this);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     // foto ou gallery
@@ -353,5 +392,41 @@ public class AddArticlesActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
+    }
+
+
+
+    // implement LocationListener and ovverride all its abstracts methods
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        // Test to see lat and long
+        Toast.makeText(this, ""+location.getLatitude()+","+location.getLongitude(), Toast.LENGTH_SHORT).show();
+
+        try {
+            //Gecoder Class for refers to transform street adress or any adress into lat and long
+            Geocoder geocoder = new Geocoder(this,Locale.getDefault());
+            // Adress class helps in fetching the street adresse,locality,city,country etc
+            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+            String address = addresses.get(0).getAddressLine(0);
+
+            binding.price.setText(address);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        LocationListener.super.onStatusChanged(provider, status, extras);
+    }
+
+    @Override
+    public void onProviderEnabled(@NonNull String provider) {
+        LocationListener.super.onProviderEnabled(provider);
+    }
+
+    @Override
+    public void onProviderDisabled(@NonNull String provider) {
+        LocationListener.super.onProviderDisabled(provider);
     }
 }
