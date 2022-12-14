@@ -95,7 +95,6 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
                 chooseImage(AddArticlesActivity.this);
             }
         });
-
         //// mettre la navigation bar qu'on vois en bas de l'écran /////
         binding.bottomNavigationView.setSelectedItemId(R.id.navigation_addarticles);
         binding.bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -122,7 +121,6 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
                 return true;
             }
         });
-
         ///// nav bar fin /////
         binding.buttonAddArticle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,7 +130,6 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
                 }
             }
         });
-
         //Runtime permissions
         if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
                 !=PackageManager.PERMISSION_GRANTED){
@@ -140,16 +137,16 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
                     Manifest.permission.ACCESS_FINE_LOCATION
             },100);
         }
-
-
         /////// ADRESSE BOUTTON/////////
         binding.buttonLocalisation.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 getLocation();
             }
         });
     }
+
 
     @SuppressLint("MissingPermission")
     private void getLocation() {
@@ -241,7 +238,6 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        System.out.println("result =======> " + resultCode);
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != RESULT_CANCELED) {
             switch (requestCode) {
@@ -271,7 +267,6 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
             }
         }
     }
-
     // fin foto ou gallery
 
     private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
@@ -345,7 +340,7 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
                     preferenceManager.putString(Constants.KEY_DESCRIPTION_ARTICLE, binding.description.getText().toString());
                     preferenceManager.putString(Constants.KEY_USERNAME, preferenceManager.getString(Constants.KEY_USERNAME));
                     preferenceManager.putString(Constants.KEY_USER_ID, preferenceManager.getString(Constants.KEY_USER_ID));
-                    preferenceManager.putString(Constants.KEY_LOCALISATION_ARTICLE, address);
+                    preferenceManager.putString(Constants.KEY_LOCALISATION_ARTICLE, binding.localisation.getText().toString());
                     preferenceManager.putString(Constants.KEY_TIMESTAMP_ARTICLE, getReadableDateTime(new Date()));
                     preferenceManager.putString(Constants.KEY_PRICE_ARTICLE, binding.price.getText().toString());
                     preferenceManager.putString(Constants.KEY_IMAGE_ARTICLE, encodedImage);
@@ -368,11 +363,9 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
             progressDialog.dismiss();
         }
     }
-
     ///// méthodes nécesaires a addArticle()
-
     private String encodeImage(Bitmap bitmap) {
-        int previewWidth = 150;
+        int previewWidth = 250;
         int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
         Bitmap prewiewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -382,71 +375,44 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
 
     }
 
-    private void showToast(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-    }
-
     private String getReadableDateTime(Date date) {
         return new SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault()).format(date);
     }
-
-    /// si il appuis sur retour il revient a la page home(mainActivity)
-    @Override
-    public void onBackPressed() {
-        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+    //affiche toast
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
-
-
-
     // implement LocationListener and ovverride all its abstracts methods
     @Override
     public void onLocationChanged(@NonNull Location location) {
         // Test to see lat and long
-        Toast.makeText(this, ""+location.getLatitude()+","+location.getLongitude(), Toast.LENGTH_SHORT).show();
-
         try {
             //Gecoder Class for refers to transform street adress or any adress into lat and long
             Geocoder geocoder = new Geocoder(this,Locale.getDefault());
             // Adress class helps in fetching the street adresse,locality,city,country etc
             List<Address> addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
             address = addresses.get(0).getAddressLine(0);
+            binding.localisation.setText(address);
 
-            //binding.price.setText(address);
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        // sauvegarder la position das la DB
-        Localisation locationUser =  new Localisation(
-                location.getLatitude(),
-                location.getLongitude()
-        );
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-        HashMap<String, Object> user = new HashMap<>();
-        // les données sont inversé///////
-        user.put("longitude", locationUser.getLatitude());
-        user.put("latitude", locationUser.getLongitude());
-
-        database.collection("localisation Actuel")
-                .add(user)
-                .addOnSuccessListener(documentReference -> {
-                })
-                .addOnFailureListener(exception -> {
-                });
     }
-
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         LocationListener.super.onStatusChanged(provider, status, extras);
     }
-
     @Override
     public void onProviderEnabled(@NonNull String provider) {
         LocationListener.super.onProviderEnabled(provider);
     }
-
     @Override
     public void onProviderDisabled(@NonNull String provider) {
         LocationListener.super.onProviderDisabled(provider);
+    }
+    /// si il appuis sur retour il revient a la page home(mainActivity)
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
 }

@@ -44,32 +44,6 @@ public class MessagingService extends FirebaseMessagingService {
         user.setUsername(remoteMessage.getData().get(Constants.KEY_USERNAME));
         user.setToken(remoteMessage.getData().get(Constants.KEY_FCM_TOKEN));
 
-        Article article = new Article();
-        article.setId(remoteMessage.getData().get(Constants.KEY_ARTICLE_ID));
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-        database.collection(Constants.KEY_COLLECTION_ARTICLES)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        for (QueryDocumentSnapshot queryDocumentSnapshot: task.getResult()) {
-                            if (article.getId().equals(queryDocumentSnapshot.getId())) {
-                                article.setTitle(queryDocumentSnapshot.getString(Constants.KEY_TITLE_ARTICLE));
-                                article.setDescription(queryDocumentSnapshot.getString(Constants.KEY_DESCRIPTION_ARTICLE));
-                                article.setSeller(queryDocumentSnapshot.getString(Constants.KEY_USERNAME));
-                                article.setLocalisation(queryDocumentSnapshot.getString(Constants.KEY_LOCALISATION_ARTICLE));
-                                article.setDateTime(getReadableDateTime(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE)));
-                                article.setDateObject(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE));
-                                article.setPrice(Double.parseDouble(queryDocumentSnapshot.getString(Constants.KEY_PRICE_ARTICLE)));
-                                article.setImage(queryDocumentSnapshot.getString(Constants.KEY_IMAGE_ARTICLE));
-                                break;
-                            }
-                        }
-                    } else {
-                        System.out.println("Error");
-                    }
-                });
-
-
         int notificationid = new Random().nextInt();
         String channelId = "chat message";
 
@@ -102,12 +76,5 @@ public class MessagingService extends FirebaseMessagingService {
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManagerCompat.notify(notificationid, builder.build());
 
-
-
-    }
-
-    //conversion date
-    private String getReadableDateTime(Date date) {
-        return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }
 }

@@ -23,7 +23,7 @@
 
         <ImageButton
             android:id="@+id/imageButton"
-            android:layout_width="@dimen/_250sdp"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/_150sdp"
             app:layout_constraintTop_toTopOf="parent"
             />
@@ -39,13 +39,10 @@
     </FrameLayout>
 
 
-
-
-
         <EditText
             android:id="@+id/titleArticle"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_45sdp"
+            android:layout_height="@dimen/_35sdp"
             android:layout_marginTop="@dimen/_16sdp"
             android:layout_marginLeft="@dimen/_24sdp"
             android:layout_marginRight="@dimen/_24sdp"
@@ -65,7 +62,7 @@
     <EditText
         android:id="@+id/description"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_45sdp"
+        android:layout_height="@dimen/_35sdp"
         android:layout_marginTop="@dimen/_20sdp"
         android:layout_marginLeft="@dimen/_24sdp"
         android:layout_marginRight="@dimen/_24sdp"
@@ -85,7 +82,7 @@
         <EditText
             android:id="@+id/price"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_45sdp"
+            android:layout_height="@dimen/_35sdp"
             android:layout_marginTop="@dimen/_16sdp"
             android:layout_marginLeft="@dimen/_24sdp"
             android:layout_marginRight="@dimen/_24sdp"
@@ -99,13 +96,31 @@
             android:textColor="@color/primary_text"
             android:textSize="@dimen/_13ssp"
             app:layout_constraintTop_toBottomOf="@+id/description"
-            app:layout_constraintBottom_toTopOf="@+id/button_localisation"
+            app:layout_constraintBottom_toTopOf="@+id/localisation"
             />
+
+    <EditText
+        android:id="@+id/localisation"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_35sdp"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:layout_marginLeft="@dimen/_24sdp"
+        android:layout_marginRight="@dimen/_24sdp"
+        android:hint="@string/localisation"
+        android:paddingStart="@dimen/_16sdp"
+        android:paddingEnd="@dimen/_16sdp"
+        android:background="@drawable/background_input"
+        android:importantForAutofill="no"
+        android:textColor="@color/primary_text"
+        android:textSize="@dimen/_13ssp"
+        app:layout_constraintTop_toBottomOf="@+id/price"
+        app:layout_constraintBottom_toTopOf="@+id/button_localisation"
+        />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_localisation"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_50sdp"
+        android:layout_height="@dimen/_35sdp"
         android:layout_marginTop="@dimen/_16sdp"
         android:layout_marginLeft="@dimen/_24sdp"
         android:layout_marginRight="@dimen/_24sdp"
@@ -114,46 +129,30 @@
         android:textSize="@dimen/_13ssp"
         android:textStyle="bold"
         app:cornerRadius="@dimen/_8sdp"
-        android:background="@drawable/background_input"
-        android:backgroundTint="@color/white"
-        app:layout_constraintTop_toBottomOf="@+id/price"
-        app:layout_constraintBottom_toTopOf="@+id/layoutButton"/>
+        android:backgroundTint="@color/buttonColor"
+        app:layout_constraintTop_toBottomOf="@+id/localisation"
+        app:layout_constraintBottom_toTopOf="@+id/buttonAddArticle"/>
 
-    <FrameLayout
-        android:id="@+id/layoutButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_16sdp"
-        android:animateLayoutChanges="true"
-        tools:ignore="MissingConstraints"
-        app:layout_constraintTop_toBottomOf="@+id/button_localisation"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        android:padding="@dimen/_24sdp"
 
-        >
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonAddArticle"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_50sdp"
+            android:layout_height="@dimen/_35sdp"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:layout_marginLeft="@dimen/_24sdp"
+            android:layout_marginRight="@dimen/_24sdp"
             android:text="@string/add_article"
             android:textColor="@color/white"
             android:textSize="@dimen/_13ssp"
             android:textStyle="bold"
             app:cornerRadius="@dimen/_8sdp"
-            android:background="@drawable/background_input"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@color/buttonColor"
+            app:layout_constraintTop_toBottomOf="@+id/button_localisation"
+            app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
 
             />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="@dimen/_25sdp"
-            android:layout_height="@dimen/_25sdp"
-            android:layout_gravity="center"
-            android:visibility="invisible"/>
-
-    </FrameLayout>
 
 
 

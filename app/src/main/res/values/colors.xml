@@ -13,6 +13,7 @@
 
     <color name="small_icon_background">#31000000</color>
     <color name="transparent">#00FFFFFF</color>
+    <color name="buttonColor">#6C0975</color>
 
 
 </resources>

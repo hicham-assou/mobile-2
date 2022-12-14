@@ -101,47 +101,7 @@ public class ChatActivity extends AppCompatActivity {
     }
     // retrieve article from detailArticle or messagery
     private void loadArticleDetails() {
-
         article = (Article) getIntent().getSerializableExtra(Constants.KEY_ARTICLE);
-        //showToast("Before article Status : " + article);
-
-        if (article == null){
-
-        article = new Article();
-        //showToast("After article Status : " + article);
-
-        String articleId = (String) getIntent().getSerializableExtra(Constants.KEY_ARTICLE_ID);
-
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-        database.collection(Constants.KEY_COLLECTION_ARTICLES)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        for (QueryDocumentSnapshot queryDocumentSnapshot: task.getResult()) {
-                            if (articleId.equals(queryDocumentSnapshot.getId())) {
-                                article.setTitle(queryDocumentSnapshot.getString(Constants.KEY_TITLE_ARTICLE));
-                                article.setDescription(queryDocumentSnapshot.getString(Constants.KEY_DESCRIPTION_ARTICLE));
-                                article.setSeller(queryDocumentSnapshot.getString(Constants.KEY_USERNAME));
-                                article.setLocalisation(queryDocumentSnapshot.getString(Constants.KEY_LOCALISATION_ARTICLE));
-                                article.setDateTime(getReadableDateTime(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE)));
-                                article.setDateObject(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE));
-                                article.setPrice(Double.parseDouble(queryDocumentSnapshot.getString(Constants.KEY_PRICE_ARTICLE)));
-                                article.setImage(queryDocumentSnapshot.getString(Constants.KEY_IMAGE_ARTICLE));
-                                article.setId(queryDocumentSnapshot.getId());
-                                //showToast("IN IF article title : " + article.getTitle());
-                                //showToast("IN IF article id : " + article.getId());
-                                break;
-                            }
-                        }
-                    } else {
-                        showToast("Can't retrieve article");
-                    }
-                });
-
-        }
-
-        showToast("Out IF article image : " + article.getImage());
-        //showToast("Out IF article id : " + article.getId());
     }
     // retrieve user from detailArticle or messagery
     private void loadReceiverDetails() {
@@ -169,6 +129,7 @@ public class ChatActivity extends AppCompatActivity {
             conversion.put(Constants.KEY_RECEIVER_IMAGE, receiverUser.getImage());
             conversion.put(Constants.KEY_LAST_MESSAGE, binding.inputMessage.getText().toString());
             conversion.put(Constants.KEY_ARTICLE_ID, article.getId());
+            conversion.put(Constants.KEY_TITLE_ARTICLE, article.getTitle());
             conversion.put(Constants.KEY_TIMESTAMP, new Date());
             addConversion(conversion);
         }

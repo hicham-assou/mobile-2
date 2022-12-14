@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
             binding.textErrorMessage.setVisibility(View.INVISIBLE);
         } else {
             showErrorMessage();
+            binding.articleRecyclerView.setVisibility(View.INVISIBLE);
         }
     }
 

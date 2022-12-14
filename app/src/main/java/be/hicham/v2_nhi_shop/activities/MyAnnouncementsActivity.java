@@ -31,7 +31,7 @@ import be.hicham.v2_nhi_shop.utilities.PreferenceManager;
 public class MyAnnouncementsActivity extends AppCompatActivity implements ArticleViewListener {
     private ActivityMyAnnouncementsBinding binding;
     private PreferenceManager preferenceManager;
-    String userConnected;
+    private String userConnected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -49,6 +49,7 @@ public class MessageryActivity extends AppCompatActivity implements  ConversionL
     private List<ChatMessage> conversations;
     private RecentConversationsAdapter conversationsAdapter;
     private FirebaseFirestore database;
+    private Article article;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,41 +187,40 @@ public class MessageryActivity extends AppCompatActivity implements  ConversionL
 
     @Override
     public void onConversionClicked(User user, String articleId) {
-        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-        intent.putExtra(Constants.KEY_USER, user);
-        intent.putExtra(Constants.KEY_ARTICLE_ID, articleId);
-        startActivity(intent);
-    }
-
-    private Article setArticle(String articleId) {
-
-        Article articleNew = new Article();
+        article = new Article();
 
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         database.collection(Constants.KEY_COLLECTION_ARTICLES)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
-                        for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()) {
+                        for (QueryDocumentSnapshot queryDocumentSnapshot: task.getResult()) {
                             if (articleId.equals(queryDocumentSnapshot.getId())) {
-                                articleNew.setTitle(queryDocumentSnapshot.getString(Constants.KEY_TITLE_ARTICLE));
-                                articleNew.setDescription(queryDocumentSnapshot.getString(Constants.KEY_DESCRIPTION_ARTICLE));
-                                articleNew.setSeller(queryDocumentSnapshot.getString(Constants.KEY_USERNAME));
-                                articleNew.setLocalisation(queryDocumentSnapshot.getString(Constants.KEY_LOCALISATION_ARTICLE));
-                                articleNew.setDateTime(getReadableDateTime(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE)));
-                                articleNew.setDateObject(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE));
-                                articleNew.setPrice(Double.parseDouble(queryDocumentSnapshot.getString(Constants.KEY_PRICE_ARTICLE)));
-                                articleNew.setImage(queryDocumentSnapshot.getString(Constants.KEY_IMAGE_ARTICLE));
-                                articleNew.setId(queryDocumentSnapshot.getId());
+                                article.setTitle(queryDocumentSnapshot.getString(Constants.KEY_TITLE_ARTICLE));
+                                article.setDescription(queryDocumentSnapshot.getString(Constants.KEY_DESCRIPTION_ARTICLE));
+                                article.setSeller(queryDocumentSnapshot.getString(Constants.KEY_USERNAME));
+                                article.setLocalisation(queryDocumentSnapshot.getString(Constants.KEY_LOCALISATION_ARTICLE));
+                                article.setDateTime(getReadableDateTime(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE)));
+                                article.setDateObject(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE));
+                                article.setPrice(Double.parseDouble(queryDocumentSnapshot.getString(Constants.KEY_PRICE_ARTICLE)));
+                                article.setImage(queryDocumentSnapshot.getString(Constants.KEY_IMAGE_ARTICLE));
+                                article.setId(queryDocumentSnapshot.getId());
                             }
                         }
+                        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                        intent.putExtra(Constants.KEY_USER, user);
+                        intent.putExtra(Constants.KEY_ARTICLE, article);
+                        startActivity(intent);
+
                     } else {
                         showToast("Can't retrieve article");
                     }
                 });
 
-        return articleNew;
+
+
     }
+
 
     private String getReadableDateTime(Date date) {
         return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
