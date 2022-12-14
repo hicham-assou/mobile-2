@@ -60,6 +60,7 @@ import java.util.Locale;
 
 import be.hicham.v2_nhi_shop.R;
 import be.hicham.v2_nhi_shop.databinding.ActivityAddArticlesBinding;
+import be.hicham.v2_nhi_shop.models.Localisation;
 import be.hicham.v2_nhi_shop.utilities.Constants;
 import be.hicham.v2_nhi_shop.utilities.PreferenceManager;
 
@@ -71,9 +72,10 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
     private ProgressDialog progressDialog;
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 101;
 
-    Button button_localisation;
+    private Button button_localisation;
     // initialise LocationManager class
-    LocationManager locationManager;
+    private LocationManager locationManager;
+    private String address;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,10 +135,10 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
 
         //Runtime permissions
         if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
-            !=PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(this, new String[]{
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                },100);
+                !=PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            },100);
         }
 
 
@@ -329,7 +331,7 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
         article.put(Constants.KEY_TITLE_ARTICLE, binding.titleArticle.getText().toString());
         article.put(Constants.KEY_DESCRIPTION_ARTICLE, binding.description.getText().toString());
         article.put(Constants.KEY_USERNAME, preferenceManager.getString(Constants.KEY_USERNAME));
-        article.put(Constants.KEY_LOCALISATION_ARTICLE, "Molenbeek Saint-Jean");
+        article.put(Constants.KEY_LOCALISATION_ARTICLE, address);
         article.put(Constants.KEY_USER_ID, preferenceManager.getString(Constants.KEY_USER_ID));
         article.put(Constants.KEY_PRICE_ARTICLE, binding.price.getText().toString());
         article.put(Constants.KEY_IMAGE_ARTICLE, encodedImage);
@@ -343,7 +345,7 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
                     preferenceManager.putString(Constants.KEY_DESCRIPTION_ARTICLE, binding.description.getText().toString());
                     preferenceManager.putString(Constants.KEY_USERNAME, preferenceManager.getString(Constants.KEY_USERNAME));
                     preferenceManager.putString(Constants.KEY_USER_ID, preferenceManager.getString(Constants.KEY_USER_ID));
-                    preferenceManager.putString(Constants.KEY_LOCALISATION_ARTICLE, "Molenbeek Saint-Jean");
+                    preferenceManager.putString(Constants.KEY_LOCALISATION_ARTICLE, address);
                     preferenceManager.putString(Constants.KEY_TIMESTAMP_ARTICLE, getReadableDateTime(new Date()));
                     preferenceManager.putString(Constants.KEY_PRICE_ARTICLE, binding.price.getText().toString());
                     preferenceManager.putString(Constants.KEY_IMAGE_ARTICLE, encodedImage);
@@ -407,12 +409,30 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
             Geocoder geocoder = new Geocoder(this,Locale.getDefault());
             // Adress class helps in fetching the street adresse,locality,city,country etc
             List<Address> addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-            String address = addresses.get(0).getAddressLine(0);
+            address = addresses.get(0).getAddressLine(0);
 
-            binding.price.setText(address);
+            //binding.price.setText(address);
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        // sauvegarder la position das la DB
+        Localisation locationUser =  new Localisation(
+                location.getLatitude(),
+                location.getLongitude()
+        );
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        HashMap<String, Object> user = new HashMap<>();
+        // les données sont inversé///////
+        user.put("longitude", locationUser.getLatitude());
+        user.put("latitude", locationUser.getLongitude());
+
+        database.collection("localisation Actuel")
+                .add(user)
+                .addOnSuccessListener(documentReference -> {
+                })
+                .addOnFailureListener(exception -> {
+                });
     }
 
     @Override

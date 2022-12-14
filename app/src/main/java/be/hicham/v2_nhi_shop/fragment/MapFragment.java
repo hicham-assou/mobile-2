@@ -3,6 +3,8 @@ package be.hicham.v2_nhi_shop.fragment;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -25,6 +27,8 @@ import com.google.android.gms.maps.internal.ICameraUpdateFactoryDelegate;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -32,88 +36,72 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import be.hicham.v2_nhi_shop.R;
 import be.hicham.v2_nhi_shop.databinding.ActivityMapsBinding;
+import be.hicham.v2_nhi_shop.models.Article;
 import be.hicham.v2_nhi_shop.models.Localisation;
+import be.hicham.v2_nhi_shop.utilities.Constants;
 import be.hicham.v2_nhi_shop.utilities.PreferenceManager;
 
 public class MapFragment extends Fragment {
 
-    LatLng userLatLong;
-    LocationListener locationListener;
-    LocationManager locationManager;
+    private LatLng userLatLong;
+    private LocationListener locationListener;
+    private LocationManager locationManager;
 
     private GoogleMap mMap;
+    private Article article;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        article = (Article) getArguments().getSerializable(Constants.KEY_ARTICLE);
+        System.out.println("adressse out : " + article.getLocalisation());
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map,container,false);
         SupportMapFragment supportMapFragment =(SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.fragment_Map);
+
 
         supportMapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 mMap = googleMap;
 
-                locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-                locationListener = new LocationListener() {
-                    @Override
-                    public void onLocationChanged(Location location) {
+                System.out.println("adressse  : " + article.getLocalisation());
 
-                        // sauvegarder la position das la DB
-                        Localisation locationUser =  new Localisation(
-                                location.getLatitude(),
-                                location.getLongitude()
-                        );
-                        FirebaseFirestore database = FirebaseFirestore.getInstance();
-                        HashMap<String, Object> user = new HashMap<>();
-                        user.put("latitude", locationUser.getLatitude());
-                        user.put("longitude", locationUser.getLongitude());
 
-                        database.collection("localisation Actuel")
-                                .add(user)
-                                .addOnSuccessListener(documentReference -> {
-                                })
-                                .addOnFailureListener(exception -> {
-                                });
+                // Create a new Geocoder object
+                Geocoder geocoder = new Geocoder(getContext());
+                List<Address> addresses = null;
+                try {
+                    addresses = geocoder.getFromLocationName(article.getLocalisation(), 6);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-                        // afficher la position sur la map
-                        userLatLong = new LatLng(location.getLatitude(), location.getLongitude());
-                        mMap.clear(); // To clear old marker on map
-                        mMap.addMarker(new MarkerOptions().position(userLatLong).title("Votre localisation"));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(userLatLong));
-                    }
-                };
+                // Get the first address from the list
+                Address address = addresses.get(0);
 
-                // demande de permission d'avoir leur localisation
-                askLocalisationPermission();
-            }
-            private void askLocalisationPermission() {
-                Dexter.withActivity(getActivity()).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-                        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                                ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            return;
-                        }
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 1000, locationListener);
-                    }
+                // Get the latitude and longitude of the address
+                double latitude = address.getLatitude();
+                double longitude = address.getLongitude();
 
-                    @Override
-                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                // Use the latitude and longitude values as needed
+                //GeoPoint geoPoint = getLocationFromAddress(article.getLocalisation());
+                //afficher la position sur la map
+                userLatLong = new LatLng(latitude, longitude);
+                System.out.println("lat and long : " + userLatLong);
+                mMap.clear(); // To clear old marker on map
+                mMap.addMarker(new MarkerOptions().position(userLatLong).title("Votre localisation"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(userLatLong));
 
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken permissionToken) {
-                        permissionToken.continuePermissionRequest();
-                    }
-                }).check();
             }
         });
         return view;
     }
+
 }

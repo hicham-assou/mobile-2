@@ -54,6 +54,10 @@ public class DetailArticleActivity extends AppCompatActivity {
         //////// MAPS FRAGMENT CREATION///////////////
         Fragment fragment = new MapFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.mapView,fragment).commit();
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(Constants.KEY_ARTICLE, article);
+        fragment.setArguments(bundle);
     }
 
     //Init layout data
@@ -128,8 +132,11 @@ public class DetailArticleActivity extends AppCompatActivity {
 
     private void getWeather() {
         System.out.println("getWeather => " );
+        String city = "Bruxelles";
+        double lat= 50.850346; // faut recup de la db//////////////////////////////////////
+        double lng= 4.351721; // faut recup de la db//////////////////////////////////////
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = "https://api.openweathermap.org/data/2.5/weather?q=Bruxelles&appid=9211be69198a3f97d01c865ada5360e4";
+        String url = "https://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+lng+"&appid=9211be69198a3f97d01c865ada5360e4";
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
