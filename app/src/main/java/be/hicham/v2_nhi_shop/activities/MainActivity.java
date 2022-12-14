@@ -27,6 +27,7 @@ import com.google.firebase.storage.FirebaseStorage;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -42,12 +43,15 @@ import be.hicham.v2_nhi_shop.models.User;
 import be.hicham.v2_nhi_shop.utilities.Constants;
 import be.hicham.v2_nhi_shop.utilities.PreferenceManager;
 
-public class MainActivity extends AppCompatActivity implements ArticleViewListener,
-        AdapterView.OnItemSelectedListener {
-        String[] sorting = { "Sort By Date", "Sort By Price", "Sort By Localisation"};
+public class MainActivity extends AppCompatActivity implements ArticleViewListener{
+
 
     private ActivityMainBinding binding;
     private PreferenceManager preferenceManager;
+    private List<Article> articles;
+    private ArticleAdapter articleAdapter;
+    private static final String[] sortingBy = { "Sort By Date", "Sort By Price", "Sort By Localisation"};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
                 .addOnCompleteListener(task -> {
                     loading(false);
                     if (task.isSuccessful() && task.getResult() != null) {
-                        List<Article> articles = new ArrayList<>();
+                        articles = new ArrayList<>();
                         for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()) {
                             Article article = new Article();
                             article.setTitle(queryDocumentSnapshot.getString(Constants.KEY_TITLE_ARTICLE));
@@ -84,6 +88,9 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
                             articles.add(article);
                             System.out.println(article.getDatePosted());
                         }
+
+                        Collections.sort(articles, (obj2, obj1) -> obj1.dateObject.compareTo(obj2.dateObject));
+
                         if (articles.size() > 0) {
                             ArticleAdapter articleAdapter = new ArticleAdapter(articles, this);
                             binding.articleRecyclerView.setAdapter(articleAdapter);
@@ -114,13 +121,31 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
     private void setListeners() {
         binding.searchBar.setOnClickListener(v -> binding.imageDelete.setVisibility(View.VISIBLE) );
         binding.imageDelete.setOnClickListener(v -> { binding.searchBar.getText().clear(); binding.imageDelete.setVisibility(View.INVISIBLE);});
-        binding.spinner.setOnItemSelectedListener(this);
 
         //Creating the ArrayAdapter instance having the country list
-        ArrayAdapter aa = new ArrayAdapter(this,android.R.layout.simple_spinner_item,sorting);
-        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter sorting = new ArrayAdapter(this,android.R.layout.simple_spinner_item, sortingBy);
+        sorting.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
-        binding.spinner.setAdapter(aa);
+        binding.spinner.setAdapter(sorting);
+        binding.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                String selectedSort = adapterView.getItemAtPosition(position).toString();
+
+                if (selectedSort.equals("Sort By Localisation")){
+                    Collections.sort(articles, (obj1, obj2) -> obj1.dateObject.compareTo(obj2.dateObject));
+                    articleAdapter.notifyDataSetChanged();
+                    startActivity(getIntent());
+
+                } else if (selectedSort.equals("Sort By Price")){
+                    Collections.sort(articles, (obj2, obj1) -> obj1.dateObject.compareTo(obj2.dateObject));
+                    startActivity(getIntent());
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
 
         //// nav bar
         binding.bottomNavigationView.setSelectedItemId(R.id.navigation_home);
@@ -162,26 +187,13 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
         finish();
     }
 
-
     private String getReadableDateTime(Date date) {
         return new SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault()).format(date);
     }
-
-
-    //Performing action onItemSelected and onNothing selected
-        @Override
-        public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
-            //Toast.makeText(getApplicationContext(),sorting[position] , Toast.LENGTH_LONG).show();
-        }
-        @Override
-        public void onNothingSelected(AdapterView<?> arg0) {
-            // TODO Auto-generated method stub
-        }
-
     /// si il appuis sur retour il revient a la page home(mainActivity)
     @Override
     public void onBackPressed() {
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
 
-    }
+}

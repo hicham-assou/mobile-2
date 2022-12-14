@@ -11,13 +11,20 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
 import be.hicham.v2_nhi_shop.R;
 import be.hicham.v2_nhi_shop.activities.ChatActivity;
+import be.hicham.v2_nhi_shop.activities.MessageryActivity;
+import be.hicham.v2_nhi_shop.models.Article;
 import be.hicham.v2_nhi_shop.models.User;
 import be.hicham.v2_nhi_shop.utilities.Constants;
 
@@ -37,13 +44,37 @@ public class MessagingService extends FirebaseMessagingService {
         user.setUsername(remoteMessage.getData().get(Constants.KEY_USERNAME));
         user.setToken(remoteMessage.getData().get(Constants.KEY_FCM_TOKEN));
 
+        Article article = new Article();
+        article.setId(remoteMessage.getData().get(Constants.KEY_ARTICLE_ID));
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        database.collection(Constants.KEY_COLLECTION_ARTICLES)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        for (QueryDocumentSnapshot queryDocumentSnapshot: task.getResult()) {
+                            if (article.getId().equals(queryDocumentSnapshot.getId())) {
+                                article.setTitle(queryDocumentSnapshot.getString(Constants.KEY_TITLE_ARTICLE));
+                                article.setDescription(queryDocumentSnapshot.getString(Constants.KEY_DESCRIPTION_ARTICLE));
+                                article.setSeller(queryDocumentSnapshot.getString(Constants.KEY_USERNAME));
+                                article.setLocalisation(queryDocumentSnapshot.getString(Constants.KEY_LOCALISATION_ARTICLE));
+                                article.setDateTime(getReadableDateTime(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE)));
+                                article.setDateObject(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE));
+                                article.setPrice(Double.parseDouble(queryDocumentSnapshot.getString(Constants.KEY_PRICE_ARTICLE)));
+                                article.setImage(queryDocumentSnapshot.getString(Constants.KEY_IMAGE_ARTICLE));
+                                break;
+                            }
+                        }
+                    } else {
+                        System.out.println("Error");
+                    }
+                });
+
 
         int notificationid = new Random().nextInt();
         String channelId = "chat message";
 
-        Intent intent = new Intent(this, ChatActivity.class);
+        Intent intent = new Intent(this, MessageryActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.putExtra(Constants.KEY_USER, user);
         PendingIntent pendingIntent = PendingIntent.getActivity( this,  0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId);
@@ -71,5 +102,12 @@ public class MessagingService extends FirebaseMessagingService {
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManagerCompat.notify(notificationid, builder.build());
 
+
+
+    }
+
+    //conversion date
+    private String getReadableDateTime(Date date) {
+        return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }
 }

@@ -69,16 +69,13 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         loadArticleDetails();
         loadReceiverDetails();
-        showToast("User " + receiverUser.getId());
-        showToast("Article " + article.getId());
-
-        setListeners();
         init();
         listenMessages();
+        setListeners();
     }
 
+    //Init layout data
     private void init() {
-
         binding.textName.setText(receiverUser.getUsername());
         preferenceManager = new PreferenceManager(getApplicationContext());
         chatMessages = new ArrayList<>();
@@ -89,9 +86,67 @@ public class ChatActivity extends AppCompatActivity {
         );
         binding.chatRecyclerView.setAdapter(chatAdapter);
         database = FirebaseFirestore.getInstance();
-
     }
 
+    //Init des listeners
+    private void setListeners() {
+        binding.imageBack.setOnClickListener(v -> onBackPressed());
+        binding.layoutSend.setOnClickListener(v -> sendMessage());
+        binding.imageInfo.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), DetailArticleActivity.class);
+            intent.putExtra(Constants.KEY_ARTICLE, article);
+            startActivity(intent);
+            finish();
+        });
+    }
+    // retrieve article from detailArticle or messagery
+    private void loadArticleDetails() {
+
+        article = (Article) getIntent().getSerializableExtra(Constants.KEY_ARTICLE);
+        //showToast("Before article Status : " + article);
+
+        if (article == null){
+
+        article = new Article();
+        //showToast("After article Status : " + article);
+
+        String articleId = (String) getIntent().getSerializableExtra(Constants.KEY_ARTICLE_ID);
+
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        database.collection(Constants.KEY_COLLECTION_ARTICLES)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        for (QueryDocumentSnapshot queryDocumentSnapshot: task.getResult()) {
+                            if (articleId.equals(queryDocumentSnapshot.getId())) {
+                                article.setTitle(queryDocumentSnapshot.getString(Constants.KEY_TITLE_ARTICLE));
+                                article.setDescription(queryDocumentSnapshot.getString(Constants.KEY_DESCRIPTION_ARTICLE));
+                                article.setSeller(queryDocumentSnapshot.getString(Constants.KEY_USERNAME));
+                                article.setLocalisation(queryDocumentSnapshot.getString(Constants.KEY_LOCALISATION_ARTICLE));
+                                article.setDateTime(getReadableDateTime(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE)));
+                                article.setDateObject(queryDocumentSnapshot.getDate(Constants.KEY_TIMESTAMP_ARTICLE));
+                                article.setPrice(Double.parseDouble(queryDocumentSnapshot.getString(Constants.KEY_PRICE_ARTICLE)));
+                                article.setImage(queryDocumentSnapshot.getString(Constants.KEY_IMAGE_ARTICLE));
+                                article.setId(queryDocumentSnapshot.getId());
+                                //showToast("IN IF article title : " + article.getTitle());
+                                //showToast("IN IF article id : " + article.getId());
+                                break;
+                            }
+                        }
+                    } else {
+                        showToast("Can't retrieve article");
+                    }
+                });
+
+        }
+
+        showToast("Out IF article image : " + article.getImage());
+        //showToast("Out IF article id : " + article.getId());
+    }
+    // retrieve user from detailArticle or messagery
+    private void loadReceiverDetails() {
+        receiverUser = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
+    }
     //envoyer un message
     private void sendMessage() {
         HashMap<String, Object> message = new HashMap<>();
@@ -114,7 +169,6 @@ public class ChatActivity extends AppCompatActivity {
             conversion.put(Constants.KEY_RECEIVER_IMAGE, receiverUser.getImage());
             conversion.put(Constants.KEY_LAST_MESSAGE, binding.inputMessage.getText().toString());
             conversion.put(Constants.KEY_ARTICLE_ID, article.getId());
-            conversion.put(Constants.KEY_TITLE_ARTICLE, article.getTitle());
             conversion.put(Constants.KEY_TIMESTAMP, new Date());
             addConversion(conversion);
         }
@@ -126,8 +180,10 @@ public class ChatActivity extends AppCompatActivity {
             JSONObject data = new JSONObject();
             data.put(Constants.KEY_USER_ID, preferenceManager.getString(Constants.KEY_USER_ID));
             data.put(Constants.KEY_USERNAME, preferenceManager.getString(Constants.KEY_USERNAME));
+            //data.put(Constants.KEY_RECEIVER_IMAGE, preferenceManager.getString(Constants.KEY_IMAGE));
             data.put(Constants.KEY_FCM_TOKEN, preferenceManager.getString(Constants.KEY_FCM_TOKEN));
             data.put(Constants.KEY_MESSAGE, binding.inputMessage.getText().toString());
+            data.put(Constants.KEY_ARTICLE_ID, article.getId());
 
             JSONObject body = new JSONObject();
             body.put(Constants.REMOTE_MSG_DATA, data);
@@ -141,7 +197,7 @@ public class ChatActivity extends AppCompatActivity {
 
         binding.inputMessage.setText(null);
     }
-
+    //envoyer une notification
     private void sendNotification(String messageBody){
         ApiClient.getClient().create(ApiService.class).sendMessage(
                 Constants.getRemoteMsgHeaders(),
@@ -174,9 +230,8 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
-
+    //récuperer les messages qui concernent 2 utilisateurs et un article
     private void listenMessages() {
-        //recup les messages qui concernent 2 utilisateurs et un article
         database.collection(Constants.KEY_COLLECTION_CHAT)
                 .whereEqualTo(Constants.KEY_SENDER_ID, preferenceManager.getString(Constants.KEY_USER_ID))
                 .whereEqualTo(Constants.KEY_RECEIVER_ID, receiverUser.getId())
@@ -188,7 +243,59 @@ public class ChatActivity extends AppCompatActivity {
                 .whereEqualTo(Constants.KEY_ARTICLE_ID, article.getId())
                 .addSnapshotListener(eventListener);
     }
-
+    //conversion image
+    private Bitmap getBitmapFromEncodedString(String encodedImage) {
+        if (encodedImage != null){
+            byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
+            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+        } else {
+            return null;
+        }
+    }
+    //conversion date
+    private String getReadableDateTime(Date date) {
+        return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
+    }
+    //ajouter une nouvelle conversation
+    private void addConversion(HashMap<String, Object> conversion){
+        database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
+                .add(conversion)
+                .addOnSuccessListener(documentReference -> conversionId = documentReference.getId());
+    }
+    //mettre à jour une  conversation
+    private void updateConversion(String message){
+        DocumentReference documentReference =
+                database.collection(Constants.KEY_COLLECTION_CONVERSATIONS).document(conversionId);
+        documentReference.update(
+                Constants.KEY_LAST_MESSAGE, message,
+                Constants.KEY_TIMESTAMP, new Date()
+        );
+    }
+    //verification des conversations existantes
+    private void checkForConversion(){
+        if (chatMessages.size() != 0){
+            checkForConversionRemotely(
+                    preferenceManager.getString(Constants.KEY_USER_ID),
+                    receiverUser.getId(),
+                    article.getId()
+            );
+            checkForConversionRemotely(
+                    receiverUser.getId(),
+                    preferenceManager.getString(Constants.KEY_USER_ID),
+                    article.getId()
+            );
+        }
+    }
+    //verification des conversations existantes
+    private void checkForConversionRemotely(String senderId, String receiverId, String articleId){
+        database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
+                .whereEqualTo(Constants.KEY_SENDER_ID, senderId)
+                .whereEqualTo(Constants.KEY_RECEIVER_ID, receiverId)
+                .whereEqualTo(Constants.KEY_ARTICLE_ID, articleId)
+                .get()
+                .addOnCompleteListener(conversionOnCompleteListener);
+    }
+    //Récuperer tout les messages
     private final EventListener<QuerySnapshot> eventListener = (value, error) -> {
         if (error != null) {
             return;
@@ -222,91 +329,18 @@ public class ChatActivity extends AppCompatActivity {
             checkForConversion();
         }
     };
-
-    private Bitmap getBitmapFromEncodedString(String encodedImage) {
-        if (encodedImage != null){
-            byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
-            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        } else {
-            return null;
-        }
-    }
-
-    private void loadReceiverDetails() {
-        receiverUser = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
-    }
-
-    private void loadArticleDetails() {
-
-        article = (Article) getIntent().getSerializableExtra(Constants.KEY_ARTICLE);
-
-    }
-
-    private void setListeners() {
-        binding.imageBack.setOnClickListener(v -> onBackPressed());
-        binding.layoutSend.setOnClickListener(v -> sendMessage());
-        binding.imageInfo.setOnClickListener(v -> {
-                Intent intent = new Intent(getApplicationContext(), DetailArticleActivity.class);
-                intent.putExtra(Constants.KEY_ARTICLE, article);
-                startActivity(intent);
-                finish();
-        });
-    }
-
-    private String getReadableDateTime(Date date) {
-        return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
-    }
-
-    private void addConversion(HashMap<String, Object> conversion){
-        database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
-                .add(conversion)
-                .addOnSuccessListener(documentReference -> conversionId = documentReference.getId());
-    }
-
-    private void updateConversion(String message){
-        DocumentReference documentReference =
-                database.collection(Constants.KEY_COLLECTION_CONVERSATIONS).document(conversionId);
-        documentReference.update(
-                Constants.KEY_LAST_MESSAGE, message,
-                Constants.KEY_TIMESTAMP, new Date()
-        );
-    }
-
-    private void checkForConversion(){
-        if (chatMessages.size() != 0){
-            checkForConversionRemotely(
-                    preferenceManager.getString(Constants.KEY_USER_ID),
-                    receiverUser.getId(),
-                    article.getId()
-            );
-            checkForConversionRemotely(
-                    receiverUser.getId(),
-                    preferenceManager.getString(Constants.KEY_USER_ID),
-                    article.getId()
-            );
-        }
-    }
-
-    private void checkForConversionRemotely(String senderId, String receiverId, String articleId){
-        database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
-                .whereEqualTo(Constants.KEY_SENDER_ID, senderId)
-                .whereEqualTo(Constants.KEY_RECEIVER_ID, receiverId)
-                .whereEqualTo(Constants.KEY_ARTICLE_ID, articleId)
-                .get()
-                .addOnCompleteListener(conversionOnCompleteListener);
-    }
-
+    //Recherche de l'id de la conversations
     private final OnCompleteListener<QuerySnapshot> conversionOnCompleteListener = task -> {
         if (task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0){
             DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
             conversionId = documentSnapshot.getId();
         }
     };
-
+    //afficher un toast
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
-
+    //Methode retour en arrière
     @Override
     public void onBackPressed() {
         startActivity(new Intent(getApplicationContext(), MessageryActivity.class));

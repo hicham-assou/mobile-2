@@ -6,7 +6,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -14,6 +17,8 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -46,6 +51,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 
 import be.hicham.v2_nhi_shop.R;
 import be.hicham.v2_nhi_shop.databinding.ActivityProfileBinding;
@@ -58,7 +64,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ActivityProfileBinding binding;
     private PreferenceManager preferenceManager;
     private String encodedImage;
-
+    private static final String[] languages = {"Languages", "English", "Français"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,8 +81,47 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
         } else {
             loadUserDetails();
+            init();
         }
 
+    }
+
+    private void init() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, languages);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.spinner.setAdapter(adapter);
+        binding.spinner.setSelection(0);
+        binding.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                String selectedLang = adapterView.getItemAtPosition(position).toString();
+
+                if (selectedLang.equals("English")){
+                    setLocal(ProfileActivity.this, "en");
+                    finish();
+                    startActivity(getIntent());
+                } else if (selectedLang.equals("Français")){
+                    setLocal(ProfileActivity.this, "fr");
+                    finish();
+                    startActivity(getIntent());
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+    }
+
+    private void setLocal(Activity activity, String langCode){
+        Locale locale = new Locale(langCode);
+        locale.setDefault(locale);
+        Resources resources = activity.getResources();
+        Configuration config = resources.getConfiguration();
+        config.setLocale(locale);
+        resources.updateConfiguration(config, resources.getDisplayMetrics());
     }
 
     private void setListeners() {

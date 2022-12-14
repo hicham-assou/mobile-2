@@ -104,44 +104,6 @@ public class MessageryActivity extends AppCompatActivity implements  ConversionL
         database = FirebaseFirestore.getInstance();
     }
 
-/* Methode permettant d'afficher tout les utilisateurs
-    private void getChats(){
-        loading(true);
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-        database.collection(Constants.KEY_COLLECTION_USERS)
-                .get()
-                .addOnCompleteListener(task -> {
-                   loading(false);
-                   String currentUserId = preferenceManager.getString(Constants.KEY_USER_ID);
-                   if (task.isSuccessful() && task.getResult() != null){
-                       List<User> users = new ArrayList<>();
-                       for (QueryDocumentSnapshot queryDocumentSnapshot: task.getResult()) {
-                           if (currentUserId.equals(queryDocumentSnapshot.getId())){
-                               continue;
-                           }
-                           User user = new User();
-                           user.setUsername(queryDocumentSnapshot.getString(Constants.KEY_USERNAME));
-                           user.setEmail(queryDocumentSnapshot.getString(Constants.KEY_EMAIL));
-                           user.setImage(queryDocumentSnapshot.getString(Constants.KEY_IMAGE));
-                           user.setToken(queryDocumentSnapshot.getString(Constants.KEY_FCM_TOKEN));
-                           user.setId(queryDocumentSnapshot.getId());
-                           users.add(user);
-                       }
-                       if (users.size() > 0){
-                           UserAdapter userAdapter = new UserAdapter(users, this);
-                           binding.usersRecyclerView.setAdapter(userAdapter);
-                           binding.usersRecyclerView.setVisibility(View.VISIBLE);
-
-                       } else {
-                           showErrorMessage();
-                       }
-                   } else {
-                       showErrorMessage();
-                   }
-                });
-
-    }
-*/
     // Permet de retrouver les conversations entre utilisateurs
     private void listenConversations(){
         database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
@@ -226,8 +188,7 @@ public class MessageryActivity extends AppCompatActivity implements  ConversionL
     public void onConversionClicked(User user, String articleId) {
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         intent.putExtra(Constants.KEY_USER, user);
-        Article article = setArticle(articleId);
-        intent.putExtra(Constants.KEY_ARTICLE, article);
+        intent.putExtra(Constants.KEY_ARTICLE_ID, articleId);
         startActivity(intent);
     }
 

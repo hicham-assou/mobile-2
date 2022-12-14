@@ -10,21 +10,32 @@
 
     <ImageView
         android:id="@+id/imageViewArticle"
-        android:layout_width="@dimen/_392sdp"
-        android:layout_height="230dp"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_180sdp"
         android:layout_marginTop="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
 
+
+    <View
+        android:id="@+id/headerBackground"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/background_navigation"
+        android:backgroundTint="@color/small_icon_background"
+        app:layout_constraintTop_toBottomOf="@id/imageViewArticle"
+        />
+
     <TextView
         android:id="@+id/textView_detail_title"
-        android:layout_width="390dp"
-        android:layout_height="43dp"
-        android:layout_marginTop="1dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_5sdp"
         android:layout_marginEnd="1dp"
-        android:textSize="@dimen/_20sdp"
+        android:textSize="@dimen/_40sdp"
         android:text="title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,9 +44,9 @@
 
     <TextView
         android:id="@+id/textView_detail_price"
-        android:layout_width="144dp"
-        android:layout_height="33dp"
-        android:layout_marginStart="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_marginStart="@dimen/_15sdp"
         android:text="price"
         android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,64 +54,45 @@
 
     <TextView
         android:id="@+id/textView_detail_date"
-        android:layout_width="144dp"
-        android:layout_height="33dp"
-        android:layout_marginStart="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_marginStart="@dimen/_15sdp"
         android:text="date"
         android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_detail_price" />
 
 
-    <TextView
-        android:id="@+id/textView_detail_call"
-        android:layout_width="197dp"
-        android:layout_height="55dp"
-        android:layout_marginStart="20dp"
-        android:text="call"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_detail_date" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/textView_detail_message"
-        android:layout_width="197dp"
-        android:layout_height="54dp"
-        android:layout_marginTop="64dp"
+        android:layout_width="@dimen/_75sdp"
+        android:layout_height="@dimen/_50sdp"
         android:padding="@dimen/_5sdp"
+        android:layout_marginEnd="@dimen/_50sdp"
         android:src="@drawable/ic_baseline_message_24"
         android:tint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/textView_detail_call"
         app:layout_constraintTop_toBottomOf="@+id/textView_detail_title" />
 
     <TextView
         android:id="@+id/textView_detail_description"
         android:textColor="@color/white"
-        android:layout_width="393dp"
-        android:layout_height="115dp"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_75sdp"
+        android:layout_marginStart="@dimen/_15sdp"
         android:text="description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_detail_call" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_detail_date"/>
 
     <FrameLayout
         android:id="@+id/mapView"
-        android:layout_width="391dp"
-        android:layout_height="162dp"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_170sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_detail_description" />
-
-    <TextView
-        android:id="@+id/textView_meteo"
-        android:layout_width="188dp"
-        android:layout_height="51dp"
-        android:layout_marginStart="1dp"
-        android:text="TextView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mapView" />
-
+        app:layout_constraintTop_toBottomOf="@+id/textView_detail_description"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

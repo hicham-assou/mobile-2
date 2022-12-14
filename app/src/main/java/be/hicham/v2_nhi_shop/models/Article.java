@@ -9,9 +9,6 @@ public class Article  implements Serializable {
     private String image;
     private String sellerUsername;
     private String localisation;
-
-
-
     private String id;
     private String dateTime;
     public Date dateObject;

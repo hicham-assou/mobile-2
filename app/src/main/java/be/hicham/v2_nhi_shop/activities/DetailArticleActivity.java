@@ -33,7 +33,7 @@ import be.hicham.v2_nhi_shop.utilities.PreferenceManager;
 
 public class DetailArticleActivity extends AppCompatActivity {
 
-    private String wheaterValue = "";
+    private String weatherValue = "";
     private ActivityDetailArticleBinding binding;
     private Article article;
     private User user;
@@ -46,21 +46,40 @@ public class DetailArticleActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         preferenceManager = new PreferenceManager(getApplicationContext());
 
-        // retrieve article from mainActivity
-        article = (Article) getIntent().getSerializableExtra(Constants.KEY_ARTICLE);
-        setSeller();
+        loadArticleDetails();
+        loadSellerDetails();
         init();
         setListeners();
-
 
         //////// MAPS FRAGMENT CREATION///////////////
         Fragment fragment = new MapFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.mapView,fragment).commit();
+    }
+
+    //Init layout data
+    private void init() {
+        binding.imageViewArticle.setImageBitmap(getBitmapFromEncodedString(article.getImage())); // image
+        binding.textViewDetailTitle.setText(article.getTitle());
+        binding.textViewDetailPrice.setText(article.getPrice() + " €");
+        binding.textViewDetailDate.setText(article.getDatePosted());
+
+        //If it's my article, i can't myself a message
+        if (article.getSellerUsername().equals(preferenceManager.getString(Constants.KEY_USERNAME))){
+            binding.textViewDetailMessage.setVisibility(View.GONE);
+        }
+        getWeather();
 
     }
 
-    private void setSeller() {
+    private void loadArticleDetails() {
+        article = (Article) getIntent().getSerializableExtra(Constants.KEY_ARTICLE);
+    }
+
+    private void loadSellerDetails() {
+
         user = new User();
+
+
 
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         database.collection(Constants.KEY_COLLECTION_USERS)
@@ -80,27 +99,8 @@ public class DetailArticleActivity extends AppCompatActivity {
                         showToast("Can't retrieve seller");
                     }
                 });
-
     }
 
-    private void showToast(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-    }
-
-    /// initialisation
-    private void init() {
-        binding.imageViewArticle.setImageBitmap(getBitmapFromEncodedString(article.getImage())); // image
-        binding.textViewDetailTitle.setText(article.getTitle());
-        binding.textViewDetailPrice.setText(article.getPrice() + " €");
-        binding.textViewDetailDate.setText(article.getDatePosted());
-        binding.textViewDetailCall.setText(user.getPhoneNumber());
-        System.out.println(preferenceManager.getString(Constants.KEY_USERNAME) + "ATESSTT -------------------------- " + article.getSellerUsername());
-        System.out.println( article.getSellerUsername() == preferenceManager.getString(Constants.KEY_USERNAME));
-
-        if (article.getSellerUsername().equals(preferenceManager.getString(Constants.KEY_USERNAME))){
-            binding.textViewDetailMessage.setVisibility(View.GONE);
-        }
-    }
     private void setListeners() {
 
         binding.textViewDetailMessage.setOnClickListener(v-> {
@@ -113,14 +113,8 @@ public class DetailArticleActivity extends AppCompatActivity {
             }
         });
 
-        getWeather();
         //binding.textViewDetailDescription.setText(article.getDescription() + "\n" + wheaterValue);
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
 
     private boolean checkSession() {
@@ -146,9 +140,9 @@ public class DetailArticleActivity extends AppCompatActivity {
 
                     int humidity = (int)(main.getDouble("humidity"));
 
-                    wheaterValue = "temp = " + temperature + "C°, Humidity = " + humidity + "%";
-                    System.out.println("temperature => " +wheaterValue);
-                    binding.textViewDetailDescription.setText(article.getDescription() + "\n" + wheaterValue);
+                    weatherValue = "temp = " + temperature + "C°, Humidity = " + humidity + "%";
+                    System.out.println("temperature => " +weatherValue);
+                    binding.textViewDetailDescription.setText(article.getDescription() + "\n" + weatherValue);
                     //JSONArray weather = jsonObject.getJSONArray("weather");// pour le changement d'icon, il se trouve dans une array dans le json
 
 
@@ -163,11 +157,20 @@ public class DetailArticleActivity extends AppCompatActivity {
             }
         });
         queue.add(stringRequest);
-        System.out.println("temperature 2222 => " +wheaterValue);
     }
 
     private Bitmap getBitmapFromEncodedString(String encodedImage) {
         byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
+
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+    }
+
 }
