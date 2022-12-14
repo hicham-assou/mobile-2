@@ -130,18 +130,19 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
                 }
             }
         });
-        //Runtime permissions
-        if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
-                !=PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION
-            },100);
-        }
-        /////// ADRESSE BOUTTON/////////
+
+        // ADRESSE BOUTTON
         binding.buttonLocalisation.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
+                //Runtime permissions
+                if (ContextCompat.checkSelfPermission(AddArticlesActivity.this,Manifest.permission.ACCESS_FINE_LOCATION)
+                        !=PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(AddArticlesActivity.this, new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                    },100);
+                }
                 getLocation();
             }
         });
@@ -326,7 +327,7 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
         article.put(Constants.KEY_TITLE_ARTICLE, binding.titleArticle.getText().toString());
         article.put(Constants.KEY_DESCRIPTION_ARTICLE, binding.description.getText().toString());
         article.put(Constants.KEY_USERNAME, preferenceManager.getString(Constants.KEY_USERNAME));
-        article.put(Constants.KEY_LOCALISATION_ARTICLE, address);
+        article.put(Constants.KEY_LOCALISATION_ARTICLE, binding.localisation.getText().toString());
         article.put(Constants.KEY_USER_ID, preferenceManager.getString(Constants.KEY_USER_ID));
         article.put(Constants.KEY_PRICE_ARTICLE, binding.price.getText().toString());
         article.put(Constants.KEY_IMAGE_ARTICLE, encodedImage);

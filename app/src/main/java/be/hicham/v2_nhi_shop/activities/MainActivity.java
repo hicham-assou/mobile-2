@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
                 String selectedSort = adapterView.getItemAtPosition(position).toString();
 
                 // afficher les articles selon le tri
-                System.out.println("sort BY => " + selectedSort);
                 showAllArticles(selectedSort);
             }
             @Override

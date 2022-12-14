@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
@@ -22,6 +24,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.List;
 
 import be.hicham.v2_nhi_shop.R;
 import be.hicham.v2_nhi_shop.databinding.ActivityDetailArticleBinding;
@@ -133,10 +138,24 @@ public class DetailArticleActivity extends AppCompatActivity {
     private void getWeather() {
         System.out.println("getWeather => " );
         String city = "Bruxelles";
-        double lat= 50.850346; // faut recup de la db//////////////////////////////////////
-        double lng= 4.351721; // faut recup de la db//////////////////////////////////////
+        // Create a new Geocoder object
+        Geocoder geocoder = new Geocoder(this);
+        List<Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocationName(article.getLocalisation(), 6);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Get the first address from the list
+        Address address = addresses.get(0);
+
+        // Get the latitude and longitude of the address
+        double latitude = address.getLatitude();// faut recup de la db
+        double longitude = address.getLongitude();
+
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = "https://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+lng+"&appid=9211be69198a3f97d01c865ada5360e4";
+        String url = "https://api.openweathermap.org/data/2.5/weather?lat="+latitude+"&lon="+longitude+"&appid=9211be69198a3f97d01c865ada5360e4";
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
