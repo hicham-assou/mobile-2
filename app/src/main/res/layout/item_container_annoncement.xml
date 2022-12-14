@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/_10sdp"
+    android:paddingTop="@dimen/_8sdp"
+    android:paddingBottom="@dimen/_8sdp"
+    android:background="@drawable/background_article"
+    >
+
+
+
+    <ImageView
+        android:id="@+id/imageArticleAnnouncement"
+        android:layout_width="@dimen/_110sdp"
+        android:layout_height="@dimen/_110sdp"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:background="@drawable/background_input"
+        android:backgroundTint="@color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/avatars"
+        />
+
+    <TextView
+        android:id="@+id/titleAnnouncement"
+        android:layout_width="187dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:maxLines="1"
+        android:text="@string/title"
+        android:textColor="@color/primary_text"
+        android:textSize="@dimen/_20sdp"
+        app:layout_constraintStart_toEndOf="@+id/imageArticleAnnouncement"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/price"
+        android:layout_width="94dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="80dp"
+        android:maxLines="1"
+        android:text="@string/price"
+        android:textColor="@color/primary_text"
+        android:textSize="@dimen/_20sdp"
+        app:layout_constraintStart_toEndOf="@+id/imageArticleAnnouncement"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_delete"
+        android:layout_width="117dp"
+        android:layout_height="43dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="10dp"
+        android:text="Delete"
+        android:background="#D12424"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

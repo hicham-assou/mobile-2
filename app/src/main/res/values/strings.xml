@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">V2_NHI_SHOP</string>
+    <string name="app_name">NHI SHOP</string>
     <string name="welcome">Welcome to NHI SHOP!</string>
     <string name="login_to_continue">Login to continue</string>
     <string name="email">Email</string>
@@ -25,5 +25,6 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="get_address">Get address</string>
+    <string name="my_announcements">My Announcements !</string>
 
 </resources>

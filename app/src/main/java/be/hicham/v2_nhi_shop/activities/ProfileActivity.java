@@ -134,6 +134,12 @@ public class ProfileActivity extends AppCompatActivity {
 
         });
 
+        // annonces
+        binding.myAnnouncements.setOnClickListener(view ->{
+            Intent intent = new Intent(getApplicationContext(), MyAnnouncementsActivity.class);
+            startActivity(intent);
+        });
+
         //// nav bar
         binding.bottomNavigationView.setSelectedItemId(R.id.navigation_account);
         binding.bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -230,7 +236,6 @@ public class ProfileActivity extends AppCompatActivity {
     );
 
     private void loadUserDetails() {
-        binding.userEmail.setText(preferenceManager.getString(Constants.KEY_EMAIL));
         binding.userName.setText(preferenceManager.getString(Constants.KEY_USERNAME));
         byte[] bytes = Base64.decode(preferenceManager.getString(Constants.KEY_IMAGE), Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);

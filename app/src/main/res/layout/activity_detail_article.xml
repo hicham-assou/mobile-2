@@ -79,7 +79,7 @@
         android:id="@+id/textView_detail_description"
         android:textColor="@color/white"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_75sdp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_15sdp"
         android:text="description"
         app:layout_constraintEnd_toEndOf="parent"

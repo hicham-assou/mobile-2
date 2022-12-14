@@ -35,18 +35,16 @@
         app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/background_image"
         android:scaleType="centerCrop"
-        app:layout_constraintBottom_toTopOf="@+id/userEmail"
+        app:layout_constraintBottom_toTopOf="@+id/userName"
         app:layout_constraintTop_toBottomOf="@+id/title"
         app:riv_corner_radius="@dimen/_8sdp" />
 
 
     <TextView
-        android:id="@+id/userEmail"
+        android:id="@+id/userName"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_30sdp"
-        android:layout_marginTop="@dimen/_16sdp"
-        android:layout_marginLeft="@dimen/_24sdp"
-        android:layout_marginRight="@dimen/_24sdp"
+        android:layout_marginTop="41dp"
         android:gravity="center"
         android:background="@drawable/background_input"
         android:textColor="@color/secondary_text"
@@ -55,57 +53,54 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageProfile" />
 
-
     <TextView
-        android:id="@+id/userName"
+        android:id="@+id/myAnnouncements"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_30sdp"
-        android:layout_marginTop="@dimen/_16sdp"
-        android:layout_marginLeft="@dimen/_24sdp"
-        android:layout_marginRight="@dimen/_24sdp"
+        android:layout_marginTop="10dp"
         android:gravity="center"
         android:background="@drawable/background_input"
+        android:text="My Announcements"
         android:textColor="@color/secondary_text"
         android:textSize="@dimen/_12ssp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/userName" />
 
     <Spinner
         android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_45sdp"
-        android:layout_marginTop="@dimen/_16sdp"
         android:layout_marginLeft="@dimen/_24sdp"
+        android:layout_marginTop="@dimen/_16sdp"
         android:layout_marginRight="@dimen/_24sdp"
         android:background="@drawable/background_article"
         android:imeOptions="actionDone"
         android:paddingStart="@dimen/_16sdp"
         android:paddingEnd="@dimen/_16sdp"
+        android:textAlignment="center"
         android:textColor="@color/primary_text"
         android:textSize="@dimen/_13ssp"
-        android:textAlignment="center"
-        app:layout_constraintTop_toBottomOf="@id/userName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/userLogout"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/userName"
+        app:layout_constraintVertical_bias="0.653" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/userLogout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_50sdp"
         android:layout_marginTop="@dimen/_16sdp"
-        android:layout_marginLeft="@dimen/_24sdp"
-        android:layout_marginRight="@dimen/_24sdp"
         android:text="@string/log_out"
         android:textColor="@color/white"
         android:textSize="@dimen/_13ssp"
         android:textStyle="bold"
         app:cornerRadius="@dimen/_8sdp"
-        app:layout_constraintTop_toBottomOf="@+id/userName"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/userName"
+        app:layout_constraintVertical_bias="0.682"
+        tools:layout_editor_absoluteX="46dp" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
