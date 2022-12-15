@@ -127,8 +127,6 @@ public class DetailArticleActivity extends AppCompatActivity {
     }
 
     private void getWeather() {
-        System.out.println("getWeather => " );
-        String city = "Bruxelles";
         // Create a new Geocoder object
         Geocoder geocoder = new Geocoder(this);
         List<Address> addresses = null;
@@ -151,6 +149,7 @@ public class DetailArticleActivity extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
                 try {
+                    // on recupere un JSON contenant toutes les info de la meteo de la latitude et longitude donné
                     JSONObject jsonObject = new JSONObject(response);
                     JSONObject main = jsonObject.getJSONObject("main"); // main car les info de la temperature se trouve la
                     int temperature = (int)(main.getDouble("temp")-273.15); // -273.15 pour la transformer en C°
@@ -158,7 +157,6 @@ public class DetailArticleActivity extends AppCompatActivity {
                     int humidity = (int)(main.getDouble("humidity"));
 
                     weatherValue = "temp = " + temperature + "C°, Humidity = " + humidity + "%";
-                    System.out.println("temperature => " +weatherValue);
                     binding.textViewDetailDescription.setText(article.getDescription() + "\n" + weatherValue);
                     //JSONArray weather = jsonObject.getJSONArray("weather");// pour le changement d'icon, il se trouve dans une array dans le json
 

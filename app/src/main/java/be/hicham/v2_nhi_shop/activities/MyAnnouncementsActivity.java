@@ -46,7 +46,7 @@ public class MyAnnouncementsActivity extends AppCompatActivity implements Articl
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
                         List<Article> articles = new ArrayList<>();
-
+                        // parcourir la db pour recuperer les article qui concerne l'uitilisateur connecté
                         for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()) {
                             if (user.equals(queryDocumentSnapshot.getString(Constants.KEY_USER_ID))){
                                 Article article = new Article();
@@ -79,11 +79,13 @@ public class MyAnnouncementsActivity extends AppCompatActivity implements Articl
     @Override
     public void onArticleViewClicked(Article article) {
         FirebaseFirestore database = FirebaseFirestore.getInstance();
+        // on supprime l'article de la db
         DocumentReference docRef = database.collection(Constants.KEY_COLLECTION_ARTICLES).document(article.getId());
 
         docRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
+                // on refresh la page
                 startActivity(getIntent());
                 showToast("succes delete !");
             }

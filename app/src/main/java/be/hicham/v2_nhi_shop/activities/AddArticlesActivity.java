@@ -203,20 +203,6 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case REQUEST_ID_MULTIPLE_PERMISSIONS:
-                /*if (ContextCompat.checkSelfPermission(AddArticlesActivity.this,
-                        Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getApplicationContext(),
-                                    "FlagUp Requires Access to Camara.", Toast.LENGTH_SHORT)
-                            .show();
-                } else if (ContextCompat.checkSelfPermission(AddArticlesActivity.this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getApplicationContext(),
-                            "FlagUp Requires Access to Your Storage.",
-                            Toast.LENGTH_SHORT).show();
-                    chooseImage(AddArticlesActivity.this);
-                } else {
-                    chooseImage(AddArticlesActivity.this);
-                }*/
                 chooseImage(AddArticlesActivity.this);
                 break;
         }
@@ -275,7 +261,7 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
             }
     );
 
-    ///// requirements pour pouvoir ajouter un article (titre, prix, ...)
+    // requirements pour pouvoir ajouter un article (titre, prix, ...)
     private boolean isValidInput() {
 
         if (binding.titleArticle.getText().toString().trim().isEmpty()) {
@@ -295,7 +281,7 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
         }
     }
 
-    //// si il est pas co alors on le renvoie a l'activity login
+    // si il est pas connecté alors on le renvoie a l'activity login
     private void checkSession() {
 
         if (preferenceManager.getString(Constants.KEY_USER_ID) == null) {
@@ -304,7 +290,7 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
 
     }
 
-    /// ajouter des article a la DB du coup a l'application
+    // ajouter des article a la DB
     private void addArticle() {
         loading(true);
         FirebaseFirestore database = FirebaseFirestore.getInstance();
@@ -349,7 +335,7 @@ public class AddArticlesActivity extends AppCompatActivity implements LocationLi
             progressDialog.dismiss();
         }
     }
-    ///// méthodes nécesaires a addArticle()
+    //permet de redimensionner l'image
     private String encodeImage(Bitmap bitmap) {
         int previewWidth = 150;
         int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
