@@ -1,11 +1,5 @@
 package be.hicham.v2_nhi_shop.activities;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -15,47 +9,37 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.Source;
-import com.google.firebase.messaging.FirebaseMessaging;
-
-import android.util.Base64;
-import android.widget.Toast;
-
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 
 import be.hicham.v2_nhi_shop.R;
 import be.hicham.v2_nhi_shop.databinding.ActivityProfileBinding;
-import be.hicham.v2_nhi_shop.databinding.ActivityRegisterBinding;
 import be.hicham.v2_nhi_shop.utilities.Constants;
 import be.hicham.v2_nhi_shop.utilities.PreferenceManager;
 
@@ -76,7 +60,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void checkSession() {
-
+        //Si l'on est pas connecté on est redirigé vers la page Login
         if (preferenceManager.getString(Constants.KEY_USER_ID) == null) {
             startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
         } else {
@@ -85,7 +69,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
     }
-
+    //Init Layout
     private void init() {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, languages);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -115,6 +99,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
+    //Choix du langages
     private void setLocal(Activity activity, String langCode){
         Locale locale = new Locale(langCode);
         locale.setDefault(locale);
@@ -124,17 +109,18 @@ public class ProfileActivity extends AppCompatActivity {
         resources.updateConfiguration(config, resources.getDisplayMetrics());
     }
 
+    //Init des listeners
     private void setListeners() {
         //On press, sign out and go back to main menu
         binding.userLogout.setOnClickListener(v -> logOut());
+        //En cliquant sur l'image profile on peut changer sa photo de profil
         binding.imageProfile.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             intent.addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
             pickImage.launch(intent);
-
         });
 
-        // annonces
+        // ouvre l'activité mes annonces
         binding.myAnnouncements.setOnClickListener(view ->{
             Intent intent = new Intent(getApplicationContext(), MyAnnouncementsActivity.class);
             startActivity(intent);

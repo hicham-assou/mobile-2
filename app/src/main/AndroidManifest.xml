@@ -49,10 +49,6 @@
             android:value="AIzaSyBs4Rdw-IqDmhd8WXLYKGVtfVMVi0UQ3fc" />
 
         <activity
-            android:name=".activities.MapsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_maps" />
-        <activity
             android:name=".activities.ChatActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize">

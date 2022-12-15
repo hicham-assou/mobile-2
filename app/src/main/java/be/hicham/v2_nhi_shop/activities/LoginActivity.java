@@ -1,27 +1,18 @@
 package be.hicham.v2_nhi_shop.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import be.hicham.v2_nhi_shop.R;
 import be.hicham.v2_nhi_shop.databinding.ActivityLoginBinding;
 import be.hicham.v2_nhi_shop.utilities.Constants;
 import be.hicham.v2_nhi_shop.utilities.PreferenceManager;
@@ -47,16 +38,12 @@ public class LoginActivity extends AppCompatActivity {
 
         binding.buttonSignIn.setOnClickListener(v -> {
             if (isValidSignInput()) {
-                signIn();
+                signIn(); //connexion
             }
         });
     }
 
-    /// si il appuis sur retour il revient a la page home(mainActivity)
-    @Override
-    public void onBackPressed() {
-        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-    }
+
 
     /// requirements pour pouvoir se connecter sinn il peut pas
     private boolean isValidSignInput() {
@@ -86,21 +73,13 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0) {
                         DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
-                        System.out.println(preferenceManager.getString(Constants.KEY_USERNAME));
-                        System.out.println(preferenceManager.getString(Constants.KEY_FCM_TOKEN));
-                        System.out.println(preferenceManager.getString(Constants.KEY_USER_ID));
-
+                        //Sauvegarde des données user localement
                         preferenceManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
                         preferenceManager.putString(Constants.KEY_USER_ID, documentSnapshot.getId());
                         preferenceManager.putString(Constants.KEY_USERNAME, documentSnapshot.getString(Constants.KEY_USERNAME));
                         preferenceManager.putString(Constants.KEY_IMAGE, documentSnapshot.getString(Constants.KEY_IMAGE));
                         Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
                         getToken();
-                        System.out.println(preferenceManager.getString(Constants.KEY_USERNAME));
-                        System.out.println(preferenceManager.getString(Constants.KEY_FCM_TOKEN));
-                        System.out.println(preferenceManager.getString(Constants.KEY_USER_ID).toString());
-
-
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     } else {
@@ -109,11 +88,11 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
-
+    //récup du token
     private void getToken() {
         FirebaseMessaging.getInstance().getToken().addOnSuccessListener(this::updateToken);
     }
-
+    //mise à jour du fcm token
     private void updateToken(String token) {
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         DocumentReference documentReference =
@@ -124,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnSuccessListener(unused -> showToast("Token updated successfully!"))
                 .addOnFailureListener(e -> showToast("Unable to update Token"));
     }
-
+    //affichage de la progressbar
     private void loading(boolean isLoading) {
         if (isLoading) {
             binding.buttonSignIn.setVisibility(View.INVISIBLE);
@@ -137,6 +116,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    /// si il appuis sur retour il revient a la page home(mainActivity)
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
 
 }

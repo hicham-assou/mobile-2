@@ -5,11 +5,11 @@
     <string name="email">Email</string>
     <string name="password">Mot de passe</string>
     <string name="create_new_account">S\'inscrire</string>
-    <string name="add_image">Ajouter une image</string>
+    <string name="add_image">Ajouter image</string>
     <string name="username">Pseudo</string>
     <string name="confirm_password">Confirmez le mot de passe</string>
-    <string name="sign_in">S\'inscrire</string>
-    <string name="sign_up">Se connecter</string>
+    <string name="sign_in">Se connecter</string>
+    <string name="sign_up">S\'inscrire</string>
     <string name="messagery">Messagerie</string>
     <string name="type_a_message">Écrire un message</string>
     <string name="log_out">Se déconnecter</string>

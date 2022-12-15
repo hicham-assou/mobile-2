@@ -11,20 +11,13 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Random;
 
 import be.hicham.v2_nhi_shop.R;
-import be.hicham.v2_nhi_shop.activities.ChatActivity;
 import be.hicham.v2_nhi_shop.activities.MessageryActivity;
-import be.hicham.v2_nhi_shop.models.Article;
 import be.hicham.v2_nhi_shop.models.User;
 import be.hicham.v2_nhi_shop.utilities.Constants;
 
@@ -39,18 +32,20 @@ public class MessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+        //Création de la notification à base du sender
         User user = new User();
         user.setId(remoteMessage.getData().get(Constants.KEY_USER_ID));
         user.setUsername(remoteMessage.getData().get(Constants.KEY_USERNAME));
         user.setToken(remoteMessage.getData().get(Constants.KEY_FCM_TOKEN));
 
-        int notificationid = new Random().nextInt();
-        String channelId = "chat message";
-
+        int notificationId = new Random().nextInt();
+        String channelId = "chat_message";
+        //Notification renvoie à la page messagerie
         Intent intent = new Intent(this, MessageryActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity( this,  0, intent, PendingIntent.FLAG_IMMUTABLE);
 
+        //Notif builder
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId);
         builder.setSmallIcon(R.drawable.ic_notifications);
         builder.setContentTitle(user.getUsername());
@@ -74,7 +69,7 @@ public class MessagingService extends FirebaseMessagingService {
         }
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
-        notificationManagerCompat.notify(notificationid, builder.build());
+        notificationManagerCompat.notify(notificationId, builder.build());
 
     }
 }

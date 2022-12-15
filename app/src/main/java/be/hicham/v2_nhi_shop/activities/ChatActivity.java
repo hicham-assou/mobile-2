@@ -1,29 +1,23 @@
 package be.hicham.v2_nhi_shop.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
+import android.view.View;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.Source;
-
-import android.util.Base64;
-import android.view.View;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +32,6 @@ import java.util.List;
 import java.util.Locale;
 
 import be.hicham.v2_nhi_shop.adapter.ChatAdapter;
-import be.hicham.v2_nhi_shop.adapter.UserAdapter;
 import be.hicham.v2_nhi_shop.databinding.ActivityChatBinding;
 import be.hicham.v2_nhi_shop.models.Article;
 import be.hicham.v2_nhi_shop.models.ChatMessage;
@@ -74,7 +67,7 @@ public class ChatActivity extends AppCompatActivity {
         setListeners();
     }
 
-    //Init layout data
+    //Init values & layout data
     private void init() {
         binding.textName.setText(receiverUser.getUsername());
         preferenceManager = new PreferenceManager(getApplicationContext());
@@ -109,6 +102,7 @@ public class ChatActivity extends AppCompatActivity {
     }
     //envoyer un message
     private void sendMessage() {
+        //Création de l'objet message
         HashMap<String, Object> message = new HashMap<>();
         message.put(Constants.KEY_SENDER_ID, preferenceManager.getString(Constants.KEY_USER_ID));
         message.put(Constants.KEY_RECEIVER_ID, receiverUser.getId());
@@ -116,10 +110,13 @@ public class ChatActivity extends AppCompatActivity {
         message.put(Constants.KEY_ARTICLE_ID, article.getId());
         message.put(Constants.KEY_TITLE_ARTICLE, article.getTitle());
         message.put(Constants.KEY_TIMESTAMP, new Date());
+        //Ajout du message à la base de données
         database.collection(Constants.KEY_COLLECTION_CHAT).add(message);
+        //Mise à jour de la conversation si existante
         if (conversionId != null) {
             updateConversion(binding.inputMessage.getText().toString());
         } else {
+            //Sinon on crée une nouuvelle convesation
             HashMap<String, Object> conversion = new HashMap<>();
             conversion.put(Constants.KEY_SENDER_ID, preferenceManager.getString(Constants.KEY_USER_ID));
             conversion.put(Constants.KEY_SENDER_NAME, preferenceManager.getString(Constants.KEY_USERNAME));
@@ -134,6 +131,7 @@ public class ChatActivity extends AppCompatActivity {
             addConversion(conversion);
         }
 
+        //Création de l'objet JSON, contenant les infos de la notification
         try{
             JSONArray tokens = new JSONArray();
             tokens.put(receiverUser.getToken());
@@ -141,10 +139,8 @@ public class ChatActivity extends AppCompatActivity {
             JSONObject data = new JSONObject();
             data.put(Constants.KEY_USER_ID, preferenceManager.getString(Constants.KEY_USER_ID));
             data.put(Constants.KEY_USERNAME, preferenceManager.getString(Constants.KEY_USERNAME));
-            //data.put(Constants.KEY_RECEIVER_IMAGE, preferenceManager.getString(Constants.KEY_IMAGE));
             data.put(Constants.KEY_FCM_TOKEN, preferenceManager.getString(Constants.KEY_FCM_TOKEN));
             data.put(Constants.KEY_MESSAGE, binding.inputMessage.getText().toString());
-            data.put(Constants.KEY_ARTICLE_ID, article.getId());
 
             JSONObject body = new JSONObject();
             body.put(Constants.REMOTE_MSG_DATA, data);
@@ -155,7 +151,7 @@ public class ChatActivity extends AppCompatActivity {
         } catch (Exception exception){
             showToast(exception.getMessage());
         }
-
+        //Apres l'envoie du message on vide l'input
         binding.inputMessage.setText(null);
     }
     //envoyer une notification

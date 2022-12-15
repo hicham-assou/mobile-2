@@ -2,10 +2,10 @@
 <resources>
     <color name="primary">#1C2E46</color>
     <color name="primary_dark">#142232</color>
-    <color name="primary_text">#212121</color>
+    <color name="primary_text">#FFFFFF</color>
     <color name="secondary_text">#757575</color>
-    <color name="white">#FFFFFF</color>
-    <color name="input_background">#ECECEC</color>
+    <color name="white">#FF000000</color>
+    <color name="input_background">#2C2C2C</color>
     <color name="icon_background">#20FFFFFF</color>
     <color name="error">#B00020</color>
     <color name="received_message_background">#090D16</color>
@@ -14,9 +14,9 @@
     <color name="small_icon_background">#31000000</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="buttonColor">#6C0975</color>
-    <color name="header">#BEFFFFFF</color>
-    <color name="container">#BEFFFFFF</color>
-    <color name="itemSelector">#92012ABD</color>
+    <color name="header">#BE2C233E</color>
+    <color name="container">#BE2C233E</color>
+    <color name="itemSelector">#92FFFFFF</color>
 
 
 </resources>

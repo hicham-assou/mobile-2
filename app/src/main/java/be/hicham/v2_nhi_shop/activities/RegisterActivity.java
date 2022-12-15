@@ -1,6 +1,5 @@
 package be.hicham.v2_nhi_shop.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,18 +13,11 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import org.w3c.dom.Document;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -33,7 +25,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 import be.hicham.v2_nhi_shop.databinding.ActivityRegisterBinding;
-import be.hicham.v2_nhi_shop.models.User;
 import be.hicham.v2_nhi_shop.utilities.Constants;
 import be.hicham.v2_nhi_shop.utilities.PreferenceManager;
 
@@ -67,10 +58,27 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
+    private void getToken() {
+        FirebaseMessaging.getInstance().getToken().addOnSuccessListener(this::updateToken);
+    }
+
+    //Création FCM
+    private void updateToken(String token) {
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        DocumentReference documentReference =
+                database.collection(Constants.KEY_COLLECTION_USERS).document(
+                        preferenceManager.getString(Constants.KEY_USER_ID)
+                );
+        documentReference.update(Constants.KEY_FCM_TOKEN, token)
+                .addOnSuccessListener(unused -> showToast("Token updated successfully!"))
+                .addOnFailureListener(e -> showToast("Unable to update Token"));
+    }
+
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
+    //Inscription
     private void signUp(){
         loading(true);
         FirebaseFirestore database = FirebaseFirestore.getInstance();
@@ -89,6 +97,7 @@ public class RegisterActivity extends AppCompatActivity {
                     preferenceManager.putString(Constants.KEY_IMAGE, encodedImage);
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    getToken();
                     startActivity(intent);
                 })
                 .addOnFailureListener(exception -> {

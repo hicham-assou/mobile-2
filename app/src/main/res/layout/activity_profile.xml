@@ -48,7 +48,7 @@
         android:layout_marginLeft="@dimen/_24sdp"
         android:layout_marginRight="@dimen/_24sdp"
         android:gravity="center"
-        android:background="@drawable/background_input"
+        android:background="@drawable/background_article"
         android:textColor="@color/secondary_text"
         android:textSize="@dimen/_12ssp"
         android:textStyle="bold"

@@ -65,7 +65,7 @@ public class DetailArticleActivity extends AppCompatActivity {
         fragment.setArguments(bundle);
     }
 
-    //Init layout data
+    //Init  layout data
     private void init() {
         binding.imageViewArticle.setImageBitmap(getBitmapFromEncodedString(article.getImage())); // image
         binding.textViewDetailTitle.setText(article.getTitle());
@@ -85,10 +85,7 @@ public class DetailArticleActivity extends AppCompatActivity {
     }
 
     private void loadSellerDetails() {
-
         user = new User();
-
-
 
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         database.collection(Constants.KEY_COLLECTION_USERS)
@@ -104,14 +101,11 @@ public class DetailArticleActivity extends AppCompatActivity {
                                 user.setId(queryDocumentSnapshot.getId());
                             }
                         }
-                    } else {
-                        showToast("Can't retrieve seller");
                     }
                 });
     }
 
     private void setListeners() {
-
         binding.textViewDetailMessage.setOnClickListener(v-> {
             if (checkSession()){
                 Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
@@ -121,9 +115,6 @@ public class DetailArticleActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-        //binding.textViewDetailDescription.setText(article.getDescription() + "\n" + wheaterValue);
-
     }
 
     private boolean checkSession() {
@@ -190,9 +181,6 @@ public class DetailArticleActivity extends AppCompatActivity {
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
-    private void showToast(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-    }
 
     @Override
     public void onBackPressed() {

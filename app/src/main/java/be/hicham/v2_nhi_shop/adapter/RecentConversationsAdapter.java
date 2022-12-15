@@ -9,12 +9,16 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.List;
 
 import be.hicham.v2_nhi_shop.databinding.ItemContainerRecentConversionBinding;
 import be.hicham.v2_nhi_shop.listeners.ConversionListener;
 import be.hicham.v2_nhi_shop.models.ChatMessage;
 import be.hicham.v2_nhi_shop.models.User;
+import be.hicham.v2_nhi_shop.utilities.Constants;
 
 public class RecentConversationsAdapter extends RecyclerView.Adapter<RecentConversationsAdapter.ConversionViewHolder>{
 
@@ -64,9 +68,24 @@ public class RecentConversationsAdapter extends RecyclerView.Adapter<RecentConve
                 user.setId(chatMessage.getConversionId());
                 user.setUsername(chatMessage.conversionName);
                 user.setImage(chatMessage.getImage());
+                FirebaseFirestore database = FirebaseFirestore.getInstance();
+
+                database.collection(Constants.KEY_COLLECTION_USERS)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful() && task.getResult() != null){
+                                for (QueryDocumentSnapshot queryDocumentSnapshot: task.getResult()) {
+                                    if (user.getId().equals(queryDocumentSnapshot.getId())){
+                                        user.setToken(queryDocumentSnapshot.getString(Constants.KEY_FCM_TOKEN));
+                                    }
+                                }
+                            }
+                        });
                 conversionListener.onConversionClicked(user, chatMessage.getArticleId());
             });
         }
+
+
     }
 
 

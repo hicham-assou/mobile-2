@@ -1,27 +1,20 @@
 package be.hicham.v2_nhi_shop.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import org.checkerframework.checker.units.qual.A;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,9 +25,7 @@ import java.util.Locale;
 
 import be.hicham.v2_nhi_shop.R;
 import be.hicham.v2_nhi_shop.adapter.RecentConversationsAdapter;
-import be.hicham.v2_nhi_shop.adapter.UserAdapter;
 import be.hicham.v2_nhi_shop.databinding.ActivityMessageryBinding;
-import be.hicham.v2_nhi_shop.listeners.ArticleChatListener;
 import be.hicham.v2_nhi_shop.listeners.ConversionListener;
 import be.hicham.v2_nhi_shop.models.Article;
 import be.hicham.v2_nhi_shop.models.ChatMessage;
@@ -114,7 +105,6 @@ public class MessageryActivity extends AppCompatActivity implements  ConversionL
                 .whereEqualTo(Constants.KEY_RECEIVER_ID, preferenceManager.getString(Constants.KEY_USER_ID))
                 .addSnapshotListener(eventListener);
     }
-
     private final EventListener<QuerySnapshot> eventListener = (value, error) -> {
         if (error != null){
             return ;
@@ -122,6 +112,7 @@ public class MessageryActivity extends AppCompatActivity implements  ConversionL
         if (value != null){
             loading(true);
             for (DocumentChange documentChange : value.getDocumentChanges()) {
+                //Si c'est une nouvelle conversations => on l'a crée
                 if (documentChange.getType() == DocumentChange.Type.ADDED) {
                     String senderId = documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
                     String receiverId = documentChange.getDocument().getString(Constants.KEY_RECEIVER_ID);
@@ -141,6 +132,7 @@ public class MessageryActivity extends AppCompatActivity implements  ConversionL
                     chatMessage.setDateObject(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
                     chatMessage.setArticleId(documentChange.getDocument().getString(Constants.KEY_ARTICLE_ID));
                     conversations.add(chatMessage);
+                    //Si c'est une conversations existantes => màj
                 } else if (documentChange.getType() == DocumentChange.Type.MODIFIED){
                     for (int i = 0; i < conversations.size(); i++){
                         String senderId = documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
@@ -179,12 +171,11 @@ public class MessageryActivity extends AppCompatActivity implements  ConversionL
             binding.progressBar.setVisibility(View.INVISIBLE);
         }
     }
-
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
-
+    //Permet d'ouvrir la conversations
     @Override
     public void onConversionClicked(User user, String articleId) {
         article = new Article();
@@ -221,11 +212,9 @@ public class MessageryActivity extends AppCompatActivity implements  ConversionL
 
     }
 
-
     private String getReadableDateTime(Date date) {
         return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }
-
     /// si il appuis sur retour il revient a la page home(mainActivity)
     @Override
     public void onBackPressed() {

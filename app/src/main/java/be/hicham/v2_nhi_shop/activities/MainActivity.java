@@ -166,9 +166,7 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
                             article.setImage(queryDocumentSnapshot.getString(Constants.KEY_IMAGE_ARTICLE));
                             article.setId(queryDocumentSnapshot.getId());
                             articlesList.add(article);
-                            System.out.println(article.getDatePosted());
                         }
-
                         showAllArticles("Ascending date");
                     } else {
                         showErrorMessage();
@@ -237,7 +235,10 @@ public class MainActivity extends AppCompatActivity implements ArticleViewListen
     // si il appuis sur retour il quitte l'app
     @Override
     public void onBackPressed() {
-        finish();
+        Intent close = new Intent(Intent.ACTION_MAIN);
+        close.addCategory(Intent.CATEGORY_HOME);
+        close.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(close);
     }
 
 }

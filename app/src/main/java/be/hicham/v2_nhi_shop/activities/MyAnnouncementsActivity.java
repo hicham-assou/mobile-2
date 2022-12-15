@@ -1,13 +1,12 @@
 package be.hicham.v2_nhi_shop.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -19,12 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import be.hicham.v2_nhi_shop.adapter.AnnouncementAdapter;
-import be.hicham.v2_nhi_shop.adapter.ArticleAdapter;
 import be.hicham.v2_nhi_shop.databinding.ActivityMyAnnouncementsBinding;
-import be.hicham.v2_nhi_shop.databinding.ActivityProfileBinding;
 import be.hicham.v2_nhi_shop.listeners.ArticleViewListener;
 import be.hicham.v2_nhi_shop.models.Article;
-import be.hicham.v2_nhi_shop.models.User;
 import be.hicham.v2_nhi_shop.utilities.Constants;
 import be.hicham.v2_nhi_shop.utilities.PreferenceManager;
 
@@ -42,7 +38,7 @@ public class MyAnnouncementsActivity extends AppCompatActivity implements Articl
         userConnected = preferenceManager.getString(Constants.KEY_USER_ID);
         getArticles(userConnected);
     }
-
+    //Recuperation des articles concernant l'user connecté
     private void getArticles(String user) {
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         database.collection(Constants.KEY_COLLECTION_ARTICLES)
